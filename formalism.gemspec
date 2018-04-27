@@ -6,10 +6,9 @@ Gem::Specification.new do |s|
 	s.name          = 'formalism'
 	s.version       = '0.0.0'
 	s.date          = Date.today.to_s
-	s.summary       = 'Actions with input data validations'
+	s.summary       = 'Forms with input data validations and nesting'
 	s.description   = <<~DESC
-		Simple actions, actions with validations, with associations, etc.
-		Can be used for models, like form objects.
+		Simple actions and complex forms with validations, nesting, etc.
 	DESC
 	s.authors       = ['Alexander Popov']
 	s.email         = 'alex.wayfer@gmail.com'
