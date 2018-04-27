@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Reactions
+module Formalism
 	## Class for any action
 	class Action
 		def run

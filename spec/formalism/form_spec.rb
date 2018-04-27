@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Reactions::Form do
+describe Formalism::Form do
 	before do
 		stub_const('YEAR_RANGE', 0..Time.now.year)
 
@@ -106,7 +106,7 @@ describe Reactions::Form do
 			end
 
 			expect(&block).to raise_error(
-				Reactions::NoCoercionError, 'Reactions has no coercion to Class'
+				Formalism::NoCoercionError, 'Formalism has no coercion to Class'
 			)
 		end
 	end

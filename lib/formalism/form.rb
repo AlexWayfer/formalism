@@ -2,7 +2,7 @@
 
 require_relative 'coercion'
 
-module Reactions
+module Formalism
 	## Class for forms
 	class Form < Action
 		class << self

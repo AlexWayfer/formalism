@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Reactions::Action do
+describe Formalism::Action do
 	subject(:test_action) do
 		Class.new(described_class) do
 			def initialize(string)

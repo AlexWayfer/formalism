@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 ## https://github.com/bbatsov/rubocop/issues/5831
-module Reactions
+module Formalism
 	## Internal class for coercions
 	class Coercion
 		def self.method_for(type)
@@ -51,7 +51,7 @@ module Reactions
 		end
 
 		def message
-			"Reactions has no coercion to #{@type}"
+			"Formalism has no coercion to #{@type}"
 		end
 	end
 end
