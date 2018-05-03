@@ -90,11 +90,16 @@ describe Formalism::Form do
 				field :foo
 				field :bar, Integer
 				field :baz, String
+				field :created_at, Time
 			end
 
-			form = form_class.new(foo: '1', bar: '2', baz: 3, qux: 4)
+			form = form_class.new(
+				foo: '1', bar: '2', baz: 3, created_at: '2018-05-03 14:02:21', qux: 4
+			)
 
-			expect(form.fields).to eq(foo: '1', bar: 2, baz: '3')
+			expect(form.fields).to eq(
+				foo: '1', bar: 2, baz: '3', created_at: Time.new(2018, 5, 3, 14, 2, 21)
+			)
 		end
 
 		it 'raises error if there is no defined coercion to received type' do

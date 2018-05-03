@@ -40,6 +40,10 @@ module Formalism
 			return if @value != int_value.to_s
 			int_value
 		end
+
+		def to_time
+			Time.parse(@value)
+		end
 	end
 
 	private_constant :Coercion
