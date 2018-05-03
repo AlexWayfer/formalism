@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'gorilla-patch/deep_dup'
 require_relative 'coercion'
 
 module Formalism
@@ -33,8 +34,12 @@ module Formalism
 			end
 		end
 
-		def initialize(params)
-			@params = params
+		attr_reader :params
+
+		using GorillaPatch::DeepDup
+
+		def initialize(params = {})
+			@params = params.deep_dup
 			self.class.fields.each do |name, _options|
 				public_send "#{name}=", params[name]
 			end
