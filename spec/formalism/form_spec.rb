@@ -85,34 +85,66 @@ describe Formalism::Form do
 			expect(form.fields).to eq(foo: 1, bar: 2)
 		end
 
-		it 'make coercion to type as second parameter' do
-			form_class = Class.new(described_class) do
-				field :foo
-				field :bar, Integer
-				field :baz, String
-				field :created_at, Time
-			end
-
-			form = form_class.new(
-				foo: '1', bar: '2', baz: 3, created_at: '2018-05-03 14:02:21', qux: 4
-			)
-
-			expect(form.fields).to eq(
-				foo: '1', bar: 2, baz: '3', created_at: Time.new(2018, 5, 3, 14, 2, 21)
-			)
-		end
-
-		it 'raises error if there is no defined coercion to received type' do
-			block = lambda do
+		describe 'coersion' do
+			let(:form_class) do
 				Class.new(described_class) do
 					field :foo
-					field :bar, Class
+					field :bar, Integer
+					field :baz, String
+					field :created_at, Time
 				end
 			end
 
-			expect(&block).to raise_error(
-				Formalism::NoCoercionError, 'Formalism has no coercion to Class'
-			)
+			let(:form) { form_class.new(params) }
+
+			subject { form.fields }
+
+			context 'params must be coerced' do
+				let(:params) do
+					{
+						foo: '1', bar: '2', baz: 3,
+						created_at: '2018-05-03 14:02:21',
+						qux: 4
+					}
+				end
+
+				it do
+					is_expected.to eq(
+						foo: '1', bar: 2, baz: '3',
+						created_at: Time.new(2018, 5, 3, 14, 2, 21)
+					)
+				end
+			end
+
+			context 'params must not be coerced' do
+				let(:params) do
+					{
+						foo: '1', bar: 2, baz: '3',
+						created_at: Time.new(2018, 5, 3, 14, 2, 21),
+						qux: 4
+					}
+				end
+
+				it do
+					is_expected.to eq(
+						foo: '1', bar: 2, baz: '3',
+						created_at: Time.new(2018, 5, 3, 14, 2, 21)
+					)
+				end
+			end
+
+			it 'raises error if there is no defined coercion to the required type' do
+				block = lambda do
+					Class.new(described_class) do
+						field :foo
+						field :bar, Class
+					end
+				end
+
+				expect(&block).to raise_error(
+					Formalism::NoCoercionError, 'Formalism has no coercion to Class'
+				)
+			end
 		end
 	end
 
