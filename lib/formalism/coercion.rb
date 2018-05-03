@@ -21,7 +21,7 @@ module Formalism
 
 		def initialize(value, type)
 			@value = value
-			@type = type
+			@type = type.is_a?(Symbol) ? Object.const_get(type.capitalize) : type
 		end
 
 		def result

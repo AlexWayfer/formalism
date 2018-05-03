@@ -92,6 +92,7 @@ describe Formalism::Form do
 					field :bar, Integer
 					field :baz, String
 					field :created_at, Time
+					field :count, :integer
 				end
 			end
 
@@ -103,7 +104,7 @@ describe Formalism::Form do
 				let(:params) do
 					{
 						foo: '1', bar: '2', baz: 3,
-						created_at: '2018-05-03 14:02:21',
+						created_at: '2018-05-03 14:02:21', count: '123',
 						qux: 4
 					}
 				end
@@ -111,7 +112,7 @@ describe Formalism::Form do
 				it do
 					is_expected.to eq(
 						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21)
+						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
 					)
 				end
 			end
@@ -120,7 +121,7 @@ describe Formalism::Form do
 				let(:params) do
 					{
 						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21),
+						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123,
 						qux: 4
 					}
 				end
@@ -128,7 +129,7 @@ describe Formalism::Form do
 				it do
 					is_expected.to eq(
 						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21)
+						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
 					)
 				end
 			end
