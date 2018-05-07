@@ -93,6 +93,7 @@ describe Formalism::Form do
 					field :baz, String
 					field :created_at, Time
 					field :count, :integer
+					field :enabled, :boolean
 				end
 			end
 
@@ -131,6 +132,32 @@ describe Formalism::Form do
 						foo: '1', bar: 2, baz: '3',
 						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
 					)
+				end
+			end
+
+			describe 'coercion to boolean' do
+				context "value is 'true'" do
+					let(:params) { { enabled: 'true' } }
+
+					it { is_expected.to eq(enabled: true) }
+				end
+
+				context 'value is true' do
+					let(:params) { { enabled: true } }
+
+					it { is_expected.to eq(enabled: true) }
+				end
+
+				context 'value is false' do
+					let(:params) { { enabled: false } }
+
+					it { is_expected.to eq(enabled: false) }
+				end
+
+				context 'value is nil' do
+					let(:params) { { enabled: nil } }
+
+					it { is_expected.to eq(enabled: false) }
 				end
 			end
 

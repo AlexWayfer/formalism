@@ -21,15 +21,22 @@ module Formalism
 
 		def initialize(value, type)
 			@value = value
-			@type = type.is_a?(Symbol) ? Object.const_get(type.capitalize) : type
+			@type = convert_type type
 		end
 
 		def result
-			return @value if @type.nil? || @value.is_a?(@type)
+			return @value if @type.nil? || (@type.is_a?(Class) && @value.is_a?(@type))
 			send self.class.method_for @type
 		end
 
 		private
+
+		def convert_type(type)
+			return type if type.nil? || type.is_a?(Class)
+			const_name = type.capitalize
+			return type unless Object.const_defined?(const_name)
+			Object.const_get(const_name)
+		end
 
 		def to_string
 			@value.to_s
@@ -43,6 +50,10 @@ module Formalism
 
 		def to_time
 			Time.parse(@value)
+		end
+
+		def to_boolean
+			@value ? true : false
 		end
 	end
 
