@@ -99,40 +99,32 @@ describe Formalism::Form do
 
 			let(:form) { form_class.new(params) }
 
+			let(:not_coerced_params) do
+				{
+					foo: '1', bar: '2', baz: 3,
+					created_at: '2018-05-03 14:02:21', count: '123'
+				}
+			end
+
+			let(:coerced_params) do
+				{
+					foo: '1', bar: 2, baz: '3',
+					created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
+				}
+			end
+
 			subject { form.fields }
 
 			context 'params must be coerced' do
-				let(:params) do
-					{
-						foo: '1', bar: '2', baz: 3,
-						created_at: '2018-05-03 14:02:21', count: '123',
-						qux: 4
-					}
-				end
+				let(:params) { not_coerced_params.merge(qux: 4) }
 
-				it do
-					is_expected.to eq(
-						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
-					)
-				end
+				it { is_expected.to eq coerced_params }
 			end
 
 			context 'params must not be coerced' do
-				let(:params) do
-					{
-						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123,
-						qux: 4
-					}
-				end
+				let(:params) { coerced_params.merge(qux: 4) }
 
-				it do
-					is_expected.to eq(
-						foo: '1', bar: 2, baz: '3',
-						created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
-					)
-				end
+				it { is_expected.to eq coerced_params }
 			end
 
 			describe 'coercion to boolean' do
@@ -187,27 +179,13 @@ describe Formalism::Form do
 				end
 
 				context 'params is filled' do
-					let(:params) do
-						{
-							foo: '1', bar: '2', baz: 3,
-							created_at: '2018-05-03 14:02:21', count: '123', enabled: 'true',
-							qux: 4
-						}
-					end
+					let(:params) { not_coerced_params.merge(enabled: 'true', qux: 4) }
 
-					it do
-						is_expected.to eq(
-							foo: '1', bar: 2, baz: '3',
-							created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123,
-							enabled: true
-						)
-					end
+					it { is_expected.to eq coerced_params.merge(enabled: true) }
 				end
 
 				context 'params is empty' do
-					let(:params) do
-						{}
-					end
+					let(:params) { {} }
 
 					it do
 						is_expected.to eq(
