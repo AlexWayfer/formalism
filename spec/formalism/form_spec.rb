@@ -119,6 +119,12 @@ describe Formalism::Form do
 				let(:params) { not_coerced_params.merge(qux: 4) }
 
 				it { is_expected.to eq coerced_params }
+
+				it 'returns coerced values from getters' do
+					coerced_params.each do |name, value|
+						expect(form.public_send(name)).to eq(value)
+					end
+				end
 			end
 
 			context 'params must not be coerced' do

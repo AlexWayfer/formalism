@@ -19,8 +19,18 @@ module Formalism
 
 			def field(name, type = nil, **options)
 				Coercion.check type unless type.nil?
+
 				fields[name] = options.merge(type: type)
-				attr_accessor name
+
+				attr_reader name
+
+				private(
+					define_method("#{name}=") do |value|
+						value = Coercion.new(value, type).result
+						instance_variable_set "@#{name}", value
+						fields[name] = value
+					end
+				)
 			end
 
 			def nested(name, form)
@@ -40,24 +50,16 @@ module Formalism
 
 		def initialize(params = {})
 			@params = params.deep_dup || {}
-			self.class.fields.each do |name, _options|
-				public_send "#{name}=", @params[name]
-			end
+
+			fill_fields
+
 			self.class.nested_forms.each do |name, form|
 				nested_forms[name] = form.new(@params[name])
 			end
 		end
 
 		def fields
-			@fields ||=
-				self.class.fields.each_with_object({}) do |(name, options), hash|
-					next unless @params.key?(name) || options.key?(:default)
-					hash[name] =
-						if @params.key?(name)
-						then Coercion.new(public_send(name), options[:type]).result
-						else options[:default]
-						end
-				end
+			@fields ||= {}
 		end
 
 		def valid?
@@ -84,6 +86,13 @@ module Formalism
 
 		def nested_forms
 			@nested_forms ||= {}
+		end
+
+		def fill_fields
+			self.class.fields.each do |name, options|
+				next unless @params.key?(name) || options.key?(:default)
+				send "#{name}=", @params.fetch(name, options[:default])
+			end
 		end
 	end
 end
