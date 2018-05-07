@@ -100,17 +100,11 @@ describe Formalism::Form do
 			let(:form) { form_class.new(params) }
 
 			let(:not_coerced_params) do
-				{
-					foo: '1', bar: '2', baz: 3,
-					created_at: '2018-05-03 14:02:21', count: '123'
-				}
+				{ foo: '1', bar: '2', baz: 3, count: '123' }
 			end
 
 			let(:coerced_params) do
-				{
-					foo: '1', bar: 2, baz: '3',
-					created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123
-				}
+				{ foo: '1', bar: 2, baz: '3', count: 123 }
 			end
 
 			subject { form.fields }
@@ -131,6 +125,28 @@ describe Formalism::Form do
 				let(:params) { coerced_params.merge(qux: 4) }
 
 				it { is_expected.to eq coerced_params }
+			end
+
+			describe 'coercion to Time' do
+				let(:coerced_time) { { created_at: Time.new(2018, 5, 3, 14, 2, 21) } }
+
+				context 'value is String' do
+					let(:params) { { created_at: '2018-05-03 14:02:21' } }
+
+					it { is_expected.to eq(coerced_time) }
+				end
+
+				context 'value is Time' do
+					let(:params) { coerced_time }
+
+					it { is_expected.to eq(coerced_time) }
+				end
+
+				context 'value is nil' do
+					let(:params) { { created_at: nil } }
+
+					it { is_expected.to eq(created_at: nil) }
+				end
 			end
 
 			describe 'coercion to boolean' do
@@ -173,12 +189,14 @@ describe Formalism::Form do
 			end
 
 			describe 'default' do
+				default_created_at = Time.new(2018, 5, 7, 14, 40)
+
 				let(:form_class) do
 					Class.new(described_class) do
 						field :foo
 						field :bar, Integer, default: nil
 						field :baz, String, default: 'qwerty'
-						field :created_at, Time, default: Time.new(2018, 5, 7, 14, 40)
+						field :created_at, Time, default: default_created_at
 						field :count, :integer, default: 0
 						field :enabled, :boolean, default: false
 					end
@@ -187,7 +205,11 @@ describe Formalism::Form do
 				context 'params is filled' do
 					let(:params) { not_coerced_params.merge(enabled: 'true', qux: 4) }
 
-					it { is_expected.to eq coerced_params.merge(enabled: true) }
+					it do
+						is_expected.to eq coerced_params.merge(
+							created_at: default_created_at, enabled: true
+						)
+					end
 				end
 
 				context 'params is empty' do
@@ -196,7 +218,7 @@ describe Formalism::Form do
 					it do
 						is_expected.to eq(
 							bar: nil, baz: 'qwerty',
-							created_at: Time.new(2018, 5, 7, 14, 40), count: 0,
+							created_at: default_created_at, count: 0,
 							enabled: false
 						)
 					end

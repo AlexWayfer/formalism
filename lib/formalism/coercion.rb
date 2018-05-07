@@ -49,6 +49,7 @@ module Formalism
 		end
 
 		def to_time
+			return if @value.nil?
 			Time.parse(@value)
 		end
 
