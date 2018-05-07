@@ -196,7 +196,7 @@ describe Formalism::Form do
 						field :foo
 						field :bar, Integer, default: nil
 						field :baz, String, default: 'qwerty'
-						field :created_at, Time, default: default_created_at
+						field :created_at, Time, default: -> { default_created_at }
 						field :count, :integer, default: 0
 						field :enabled, :boolean, default: false
 					end
