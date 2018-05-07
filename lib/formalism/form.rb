@@ -93,7 +93,7 @@ module Formalism
 				next unless @params.key?(name) || options.key?(:default)
 				default = options[:default]
 				send "#{name}=", @params.fetch(
-					name, default.is_a?(Proc) ? default.call : default
+					name, default.is_a?(Proc) ? instance_exec(&default) : default
 				)
 			end
 		end

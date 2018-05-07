@@ -107,6 +107,9 @@ describe Formalism::Form do
 				{ foo: '1', bar: 2, baz: '3', count: 123 }
 			end
 
+			let(:not_coerced_time) { '2018-05-03 14:02:21' }
+			let(:coerced_time) { Time.new(2018, 5, 3, 14, 2, 21) }
+
 			subject { form.fields }
 
 			context 'params must be coerced' do
@@ -128,18 +131,18 @@ describe Formalism::Form do
 			end
 
 			describe 'coercion to Time' do
-				let(:coerced_time) { { created_at: Time.new(2018, 5, 3, 14, 2, 21) } }
+				let(:coerced_time_params) { { created_at: coerced_time } }
 
 				context 'value is String' do
-					let(:params) { { created_at: '2018-05-03 14:02:21' } }
+					let(:params) { { created_at: not_coerced_time } }
 
-					it { is_expected.to eq(coerced_time) }
+					it { is_expected.to eq(coerced_time_params) }
 				end
 
 				context 'value is Time' do
-					let(:params) { coerced_time }
+					let(:params) { coerced_time_params }
 
-					it { is_expected.to eq(coerced_time) }
+					it { is_expected.to eq(coerced_time_params) }
 				end
 
 				context 'value is nil' do
@@ -197,17 +200,26 @@ describe Formalism::Form do
 						field :bar, Integer, default: nil
 						field :baz, String, default: 'qwerty'
 						field :created_at, Time, default: -> { default_created_at }
+						field :updated_at, Time, default: -> { created_at }
 						field :count, :integer, default: 0
 						field :enabled, :boolean, default: false
 					end
 				end
 
 				context 'params is filled' do
-					let(:params) { not_coerced_params.merge(enabled: 'true', qux: 4) }
+					let(:params) do
+						not_coerced_params.merge(
+							created_at: not_coerced_time,
+							updated_at: '2018-05-07 21:49',
+							enabled: 'true', qux: 4
+						)
+					end
 
 					it do
 						is_expected.to eq coerced_params.merge(
-							created_at: default_created_at, enabled: true
+							created_at: coerced_time,
+							updated_at: Time.new(2018, 5, 7, 21, 49),
+							enabled: true
 						)
 					end
 				end
@@ -218,8 +230,9 @@ describe Formalism::Form do
 					it do
 						is_expected.to eq(
 							bar: nil, baz: 'qwerty',
-							created_at: default_created_at, count: 0,
-							enabled: false
+							created_at: default_created_at,
+							updated_at: default_created_at,
+							count: 0, enabled: false
 						)
 					end
 				end
