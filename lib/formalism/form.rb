@@ -17,9 +17,9 @@ module Formalism
 
 			private
 
-			def field(name, type = nil)
+			def field(name, type = nil, **options)
 				Coercion.check type unless type.nil?
-				fields[name] = { type: type }
+				fields[name] = options.merge(type: type)
 				attr_accessor name
 			end
 
@@ -51,8 +51,12 @@ module Formalism
 		def fields
 			@fields ||=
 				self.class.fields.each_with_object({}) do |(name, options), hash|
-					next unless @params.key? name
-					hash[name] = Coercion.new(public_send(name), options[:type]).result
+					next unless @params.key?(name) || options.key?(:default)
+					hash[name] =
+						if @params.key?(name)
+						then Coercion.new(public_send(name), options[:type]).result
+						else options[:default]
+						end
 				end
 		end
 

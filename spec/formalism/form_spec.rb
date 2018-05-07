@@ -173,6 +173,51 @@ describe Formalism::Form do
 					Formalism::NoCoercionError, 'Formalism has no coercion to Class'
 				)
 			end
+
+			describe 'default' do
+				let(:form_class) do
+					Class.new(described_class) do
+						field :foo
+						field :bar, Integer, default: nil
+						field :baz, String, default: 'qwerty'
+						field :created_at, Time, default: Time.new(2018, 5, 7, 14, 40)
+						field :count, :integer, default: 0
+						field :enabled, :boolean, default: false
+					end
+				end
+
+				context 'params is filled' do
+					let(:params) do
+						{
+							foo: '1', bar: '2', baz: 3,
+							created_at: '2018-05-03 14:02:21', count: '123', enabled: 'true',
+							qux: 4
+						}
+					end
+
+					it do
+						is_expected.to eq(
+							foo: '1', bar: 2, baz: '3',
+							created_at: Time.new(2018, 5, 3, 14, 2, 21), count: 123,
+							enabled: true
+						)
+					end
+				end
+
+				context 'params is empty' do
+					let(:params) do
+						{}
+					end
+
+					it do
+						is_expected.to eq(
+							bar: nil, baz: 'qwerty',
+							created_at: Time.new(2018, 5, 7, 14, 40), count: 0,
+							enabled: false
+						)
+					end
+				end
+			end
 		end
 	end
 
