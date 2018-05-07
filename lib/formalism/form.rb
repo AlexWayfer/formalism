@@ -39,12 +39,12 @@ module Formalism
 		using GorillaPatch::DeepDup
 
 		def initialize(params = {})
-			@params = params.deep_dup
+			@params = params.deep_dup || {}
 			self.class.fields.each do |name, _options|
-				public_send "#{name}=", params[name]
+				public_send "#{name}=", @params[name]
 			end
 			self.class.nested_forms.each do |name, form|
-				nested_forms[name] = form.new(params[name])
+				nested_forms[name] = form.new(@params[name])
 			end
 		end
 

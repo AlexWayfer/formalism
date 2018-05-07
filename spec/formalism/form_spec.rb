@@ -231,6 +231,12 @@ describe Formalism::Form do
 
 		it { is_expected.to eq params }
 		it { is_expected.not_to be params }
+
+		context 'params does not received' do
+			let(:params) { nil }
+
+			it { is_expected.to eq({}) }
+		end
 	end
 
 	describe '#fields' do
