@@ -43,15 +43,13 @@ module Formalism
 		end
 
 		def to_integer
-			int_value = @value.to_i
-			return if @value != int_value.to_s
-			int_value
+			## https://stackoverflow.com/a/1235990/2630849
+			@value.to_i if /\A[-+]?\d+\z/.match? @value.to_s
 		end
 
 		def to_float
-			float_value = @value.to_f
-			return if @value != float_value.to_s
-			float_value
+			## https://stackoverflow.com/a/36946626/2630849
+			@value.to_f if /\A[-+]?(?:\d+(?:\.\d*)?|\.\d+)\z/.match? @value.to_s
 		end
 
 		def to_time

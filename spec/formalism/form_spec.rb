@@ -101,11 +101,11 @@ describe Formalism::Form do
 			let(:form) { form_class.new(params) }
 
 			let(:not_coerced_params) do
-				{ foo: '1', bar: '2', baz: 3, count: '123', price: '456.789' }
+				{ foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789' }
 			end
 
 			let(:coerced_params) do
-				{ foo: '1', bar: 2, baz: '3', count: 123, price: 456.789 }
+				{ foo: '1', bar: 2, baz: '3', count: -123, price: 456.789 }
 			end
 
 			let(:not_coerced_time) { '2018-05-03 14:02:21' }
