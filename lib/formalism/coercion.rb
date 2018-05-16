@@ -48,6 +48,12 @@ module Formalism
 			int_value
 		end
 
+		def to_float
+			float_value = @value.to_f
+			return if @value != float_value.to_s
+			float_value
+		end
+
 		def to_time
 			return if @value.nil?
 			Time.parse(@value)

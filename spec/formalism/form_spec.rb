@@ -93,6 +93,7 @@ describe Formalism::Form do
 					field :baz, String
 					field :created_at, Time
 					field :count, :integer
+					field :price, Float
 					field :enabled, :boolean
 				end
 			end
@@ -100,11 +101,11 @@ describe Formalism::Form do
 			let(:form) { form_class.new(params) }
 
 			let(:not_coerced_params) do
-				{ foo: '1', bar: '2', baz: 3, count: '123' }
+				{ foo: '1', bar: '2', baz: 3, count: '123', price: '456.789' }
 			end
 
 			let(:coerced_params) do
-				{ foo: '1', bar: 2, baz: '3', count: 123 }
+				{ foo: '1', bar: 2, baz: '3', count: 123, price: 456.789 }
 			end
 
 			let(:not_coerced_time) { '2018-05-03 14:02:21' }
@@ -202,6 +203,7 @@ describe Formalism::Form do
 						field :created_at, Time, default: -> { default_created_at }
 						field :updated_at, Time, default: -> { created_at }
 						field :count, :integer, default: 0
+						field :price, Float, default: 2.5
 						field :enabled, :boolean, default: false
 					end
 				end
@@ -232,7 +234,7 @@ describe Formalism::Form do
 							bar: nil, baz: 'qwerty',
 							created_at: default_created_at,
 							updated_at: default_created_at,
-							count: 0, enabled: false
+							count: 0, price: 2.5, enabled: false
 						)
 					end
 				end
