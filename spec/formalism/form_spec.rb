@@ -41,7 +41,7 @@ describe Formalism::Form do
 		)
 
 		stub_const(
-			'Album', Model.new(:id, :title, :year, :artist)
+			'Album', Model.new(:id, :title, :year, :artist, :tag)
 		)
 
 		## https://github.com/bbatsov/rubocop/issues/5830
@@ -350,6 +350,10 @@ describe Formalism::Form do
 				'Artist', Model.new(:id, :name)
 			)
 
+			stub_const(
+				'Tag', Model.new(:id, :name)
+			)
+
 			## https://github.com/bbatsov/rubocop/issues/5830
 			# rubocop:disable Lint/AccessModifierIndentation
 			stub_const(
@@ -372,14 +376,35 @@ describe Formalism::Form do
 			)
 
 			stub_const(
+				'TagForm', Class.new(described_class) do
+					field :name, String
+
+					attr_reader :tag
+
+					private
+
+					def execute
+						@tag = Tag.find_or_create(fields)
+					end
+				end
+			)
+
+			stub_const(
 				'AlbumWithNestedForm', Class.new(AlbumForm) do
 					nested :artist, ArtistForm
+
+					nested :tag, TagForm, default: -> { default_tag }
 
 					private
 
 					def execute
 						@album.artist = artist
+						@album.tag = tag
 						super
+					end
+
+					def default_tag
+						Tag.new(name: 'default')
 					end
 				end
 			)
@@ -429,15 +454,23 @@ describe Formalism::Form do
 			subject { album_with_nested_form.run }
 
 			context 'correct params' do
-				let(:params) { correct_album_params.merge(artist: { name: 'Bar' }) }
+				let(:params) do
+					correct_album_params.merge(
+						artist: { name: 'Bar' }, tag: { name: 'Blues' }
+					)
+				end
 
 				it 'runs execute of self and nested forms and returns true' do
 					is_expected.to be true
 					artist = Artist.new(id: 1, name: 'Bar')
+					tag = Tag.new(id: 1, name: 'Blues')
 					expect(Album.all).to eq([
-						Album.new(correct_album_params.merge(id: 1, artist: artist))
+						Album.new(
+							correct_album_params.merge(id: 1, artist: artist, tag: tag)
+						)
 					])
 					expect(Artist.all).to eq([artist])
+					expect(Tag.all).to eq([tag])
 				end
 			end
 
@@ -448,6 +481,7 @@ describe Formalism::Form do
 					is_expected.to be false
 					expect(Album.all).to be_empty
 					expect(Artist.all).to be_empty
+					expect(album_with_nested_form.tag).to eq(Tag.new(name: 'default'))
 				end
 			end
 		end

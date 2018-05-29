@@ -33,8 +33,9 @@ module Formalism
 				)
 			end
 
-			def nested(name, form)
-				nested_forms[name] = form
+			def nested(name, form, **options)
+				nested_forms[name] = options.merge(form: form)
+
 				define_method("#{name}_form") { nested_forms[name] }
 				define_method(name) { nested_forms[name].public_send(name) }
 			end
@@ -53,9 +54,7 @@ module Formalism
 
 			fill_fields
 
-			self.class.nested_forms.each do |name, form|
-				nested_forms[name] = form.new(@params[name])
-			end
+			fill_nested_forms
 		end
 
 		def fields
@@ -84,6 +83,8 @@ module Formalism
 
 		private
 
+		def validate; end
+
 		def nested_forms
 			@nested_forms ||= {}
 		end
@@ -94,6 +95,19 @@ module Formalism
 				default = options[:default]
 				send "#{name}=", @params.fetch(
 					name, default.is_a?(Proc) ? instance_exec(&default) : default
+				)
+			end
+		end
+
+		def fill_nested_forms
+			self.class.nested_forms.each do |name, options|
+				next unless @params.key?(name) || options.key?(:default)
+				form = options[:form].new(@params[name])
+				nested_forms[name] = form
+				next if @params.key?(name)
+				default = options[:default]
+				form.instance_variable_set(
+					"@#{name}", default.is_a?(Proc) ? instance_exec(&default) : default
 				)
 			end
 		end
