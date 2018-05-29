@@ -240,6 +240,28 @@ describe Formalism::Form do
 				end
 			end
 		end
+
+		describe 'inheritance' do
+			let(:parent_form_class) do
+				Class.new(described_class) do
+					field :foo
+				end
+			end
+
+			let(:form_class) do
+				Class.new(parent_form_class) do
+					field :bar
+				end
+			end
+
+			let(:form) { form_class.new(params) }
+
+			let(:params) { { foo: 1, bar: '2', baz: Time.now } }
+
+			subject { form.fields }
+
+			it { is_expected.to eq(foo: 1, bar: '2') }
+		end
 	end
 
 	subject(:album_form) { AlbumForm.new(params) }
