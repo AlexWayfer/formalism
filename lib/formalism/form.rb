@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'gorilla-patch/deep_dup'
+require 'gorilla_patch/deep_dup'
 require_relative 'coercion'
 
 module Formalism

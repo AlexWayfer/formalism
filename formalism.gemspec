@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
 	s.required_ruby_version = '>= 2.3.0'
 
-	s.add_dependency 'gorilla-patch', '~> 2.9'
+	s.add_dependency 'gorilla_patch', '~> 3'
 
 	s.add_development_dependency 'codecov', '~> 0'
 	s.add_development_dependency 'rake', '~> 12'
