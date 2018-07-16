@@ -15,8 +15,6 @@ module Formalism
 				@nested_forms ||= {}
 			end
 
-			private
-
 			def field(name, type = nil, **options)
 				Coercion.check type unless type.nil?
 
