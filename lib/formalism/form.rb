@@ -31,7 +31,14 @@ module Formalism
 				)
 			end
 
-			def nested(name, form, **options)
+			def nested(name, form = nil, **options)
+				unless form || options.key?(:initialize)
+					raise(
+						ArgumentError,
+						'Neither form class nor initialize block is not present'
+					)
+				end
+
 				nested_forms[name] = options.merge(form: form)
 
 				define_method("#{name}_form") { nested_forms[name] }

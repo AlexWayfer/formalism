@@ -432,6 +432,25 @@ describe Formalism::Form do
 			)
 
 			stub_const(
+				'CompositorForm', Class.new(described_class) do
+					attr_reader :compositor
+
+					field :name
+
+					private
+
+					def validate
+						return unless name.to_s.empty?
+						errors.add('Compositor name is not present')
+					end
+
+					def execute
+						@compositor = Compositor.find_or_create(fields)
+					end
+				end
+			)
+
+			stub_const(
 				'AlbumWithNestedForm', Class.new(AlbumForm) do
 					nested :artist, ArtistForm
 
@@ -439,6 +458,13 @@ describe Formalism::Form do
 
 					nested :label, LabelForm,
 						initialize: ->(form) { form.new(params[:label_name]) }
+
+					nested :compositor, initialize: (
+						proc do
+							(artist_form.valid? ? ArtistForm : CompositorForm)
+								.new(params[artist_form.valid? ? :artist : :compositor])
+						end
+					)
 
 					private
 
@@ -458,6 +484,21 @@ describe Formalism::Form do
 		end
 
 		let(:album_with_nested_form) { AlbumWithNestedForm.new(params) }
+
+		context 'without form and :initialize parameters' do
+			subject do
+				lambda do
+					AlbumWithNestedForm.nested :incorrect_form
+				end
+			end
+
+			it do
+				is_expected.to raise_error(
+					ArgumentError,
+					'Neither form class nor initialize block is not present'
+				)
+			end
+		end
 
 		describe '#valid?' do
 			subject { album_with_nested_form.valid? }
@@ -490,7 +531,10 @@ describe Formalism::Form do
 
 				it do
 					is_expected.to eq(
-						['Album title is not present', 'Artist name is not present'].to_set
+						[
+							'Album title is not present', 'Artist name is not present',
+							'Compositor name is not present'
+						].to_set
 					)
 				end
 			end
