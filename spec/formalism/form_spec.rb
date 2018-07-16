@@ -41,7 +41,7 @@ describe Formalism::Form do
 		)
 
 		stub_const(
-			'Album', Model.new(:id, :title, :year, :artist, :tag)
+			'Album', Model.new(:id, :title, :year, :artist, :tag, :label)
 		)
 
 		## https://github.com/bbatsov/rubocop/issues/5830
@@ -376,6 +376,10 @@ describe Formalism::Form do
 				'Tag', Model.new(:id, :name)
 			)
 
+			stub_const(
+				'Label', Model.new(:id, :name)
+			)
+
 			## https://github.com/bbatsov/rubocop/issues/5830
 			# rubocop:disable Lint/AccessModifierIndentation
 			stub_const(
@@ -412,16 +416,36 @@ describe Formalism::Form do
 			)
 
 			stub_const(
+				'LabelForm', Class.new(described_class) do
+					attr_reader :label
+
+					def initialize(name)
+						@name = name
+					end
+
+					private
+
+					def execute
+						@label = Label.find_or_create(name: @name)
+					end
+				end
+			)
+
+			stub_const(
 				'AlbumWithNestedForm', Class.new(AlbumForm) do
 					nested :artist, ArtistForm
 
 					nested :tag, TagForm, default: -> { default_tag }
+
+					nested :label, LabelForm,
+						initialize: ->(form) { form.new(params[:label_name]) }
 
 					private
 
 					def execute
 						@album.artist = artist
 						@album.tag = tag
+						@album.label = label
 						super
 					end
 
@@ -478,7 +502,7 @@ describe Formalism::Form do
 			context 'correct params' do
 				let(:params) do
 					correct_album_params.merge(
-						artist: { name: 'Bar' }, tag: { name: 'Blues' }
+						artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
 					)
 				end
 
@@ -486,13 +510,17 @@ describe Formalism::Form do
 					is_expected.to be true
 					artist = Artist.new(id: 1, name: 'Bar')
 					tag = Tag.new(id: 1, name: 'Blues')
+					label = Label.new(id: 1, name: 'RAM')
 					expect(Album.all).to eq([
 						Album.new(
-							correct_album_params.merge(id: 1, artist: artist, tag: tag)
+							correct_album_params.merge(
+								id: 1, artist: artist, tag: tag, label: label
+							)
 						)
 					])
 					expect(Artist.all).to eq([artist])
 					expect(Tag.all).to eq([tag])
+					expect(Label.all).to eq([label])
 				end
 			end
 
@@ -503,6 +531,7 @@ describe Formalism::Form do
 					is_expected.to be false
 					expect(Album.all).to be_empty
 					expect(Artist.all).to be_empty
+					expect(Label.all).to be_empty
 					expect(album_with_nested_form.tag).to eq(Tag.new(name: 'default'))
 				end
 			end

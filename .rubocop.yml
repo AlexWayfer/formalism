@@ -4,6 +4,8 @@ Layout/IndentationWidth:
   Width: 1
 Layout/IndentArray:
   EnforcedStyle: consistent
+Layout/AlignParameters:
+  EnforcedStyle: with_fixed_indentation
 
 Metrics/BlockLength:
   Exclude:

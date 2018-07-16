@@ -99,15 +99,24 @@ module Formalism
 
 		def fill_nested_forms
 			self.class.nested_forms.each do |name, options|
-				next unless @params.key?(name) || options.key?(:default)
-				form = options[:form].new(@params[name])
-				nested_forms[name] = form
-				next if @params.key?(name)
-				default = options[:default]
-				form.instance_variable_set(
-					"@#{name}", default.is_a?(Proc) ? instance_exec(&default) : default
-				)
+				nested_forms[name] = initialize_nested_form(name, options)
+				next if @params.key?(name) || options.key?(:initialize)
+				set_default_for_nested_form name, options
 			end
+		end
+
+		def initialize_nested_form(name, options)
+			instance_exec(
+				options[:form],
+				&options.fetch(:initialize, ->(form) { form.new(params[name]) })
+			)
+		end
+
+		def set_default_for_nested_form(name, options)
+			default = options[:default]
+			nested_forms[name].instance_variable_set(
+				"@#{name}", default.is_a?(Proc) ? instance_exec(&default) : default
+			)
 		end
 	end
 end
