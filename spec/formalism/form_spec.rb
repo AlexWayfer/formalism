@@ -466,6 +466,8 @@ describe Formalism::Form do
 						end
 					)
 
+					nested :update_something, initialize: ->(_form) { nil }
+
 					private
 
 					def execute
