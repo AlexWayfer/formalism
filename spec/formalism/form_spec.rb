@@ -74,45 +74,48 @@ describe Formalism::Form do
 	end
 
 	describe '.field' do
-		it 'filters input params for #fields' do
-			form_class = Class.new(described_class) do
+		let(:form_class) do
+			Class.new(described_class) do
 				field :foo
-				field :bar
+				field :bar, Integer
+				field :baz, String
+				field :created_at, Time
+				field :count, :integer
+				field :price, Float
+				field :enabled, :boolean
 			end
-
-			form = form_class.new(foo: 1, bar: 2, baz: 3)
-
-			expect(form.fields).to eq(foo: 1, bar: 2)
 		end
 
-		describe 'coersion' do
+		let(:form) { form_class.new(params) }
+
+		let(:not_coerced_time) { '2018-05-03 14:02:21' }
+
+		let(:not_coerced_params) do
+			{ foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789' }
+		end
+
+		let(:coerced_time) { Time.new(2018, 5, 3, 14, 2, 21) }
+
+		let(:coerced_params) do
+			{ foo: '1', bar: 2, baz: '3', count: -123, price: 456.789 }
+		end
+
+		subject { form.fields }
+
+		describe 'filtering input params for' do
 			let(:form_class) do
 				Class.new(described_class) do
 					field :foo
-					field :bar, Integer
-					field :baz, String
-					field :created_at, Time
-					field :count, :integer
-					field :price, Float
-					field :enabled, :boolean
+					field :bar
 				end
 			end
 
-			let(:form) { form_class.new(params) }
+			let(:params) { { foo: 1, bar: 2, baz: 3 } }
 
-			let(:not_coerced_params) do
-				{ foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789' }
-			end
+			it { is_expected.to eq(foo: 1, bar: 2) }
+		end
 
-			let(:coerced_params) do
-				{ foo: '1', bar: 2, baz: '3', count: -123, price: 456.789 }
-			end
-
-			let(:not_coerced_time) { '2018-05-03 14:02:21' }
-			let(:coerced_time) { Time.new(2018, 5, 3, 14, 2, 21) }
-
-			subject { form.fields }
-
+		describe 'coersion' do
 			context 'params must be coerced' do
 				let(:params) { not_coerced_params.merge(qux: 4) }
 
@@ -191,68 +194,68 @@ describe Formalism::Form do
 					Formalism::NoCoercionError, 'Formalism has no coercion to Class'
 				)
 			end
+		end
 
-			describe ':default option' do
-				default_created_at = Time.new(2018, 5, 7, 14, 40)
+		describe ':default option' do
+			default_created_at = Time.new(2018, 5, 7, 14, 40)
 
-				let(:form_class) do
-					Class.new(described_class) do
-						field :foo
-						field :bar, Integer, default: nil
-						field :baz, String, default: 'qwerty'
-						field :created_at, Time, default: -> { default_created_at }
-						field :updated_at, Time, default: -> { created_at }
-						field :count, :integer, default: 0
-						field :price, Float, default: 2.5
-						field :enabled, :boolean, default: false
-					end
-				end
-
-				context 'params is filled' do
-					let(:params) do
-						not_coerced_params.merge(
-							created_at: not_coerced_time,
-							updated_at: '2018-05-07 21:49',
-							enabled: 'true', qux: 4
-						)
-					end
-
-					it do
-						is_expected.to eq coerced_params.merge(
-							created_at: coerced_time,
-							updated_at: Time.new(2018, 5, 7, 21, 49),
-							enabled: true
-						)
-					end
-				end
-
-				context 'params is empty' do
-					let(:params) { {} }
-
-					it do
-						is_expected.to eq(
-							bar: nil, baz: 'qwerty',
-							created_at: default_created_at,
-							updated_at: default_created_at,
-							count: 0, price: 2.5, enabled: false
-						)
-					end
+			let(:form_class) do
+				Class.new(described_class) do
+					field :foo
+					field :bar, Integer, default: nil
+					field :baz, String, default: 'qwerty'
+					field :created_at, Time, default: -> { default_created_at }
+					field :updated_at, Time, default: -> { created_at }
+					field :count, :integer, default: 0
+					field :price, Float, default: 2.5
+					field :enabled, :boolean, default: false
 				end
 			end
 
-			describe ':key option' do
-				let(:form_class) do
-					Class.new(described_class) do
-						field :foo, key: :bar
-						field :bar
-						field :baz, key: :foo
-					end
+			context 'params is filled' do
+				let(:params) do
+					not_coerced_params.merge(
+						created_at: not_coerced_time,
+						updated_at: '2018-05-07 21:49',
+						enabled: 'true', qux: 4
+					)
 				end
 
-				let(:params) { { foo: 'foo', bar: 'bar', baz: 'baz' } }
-
-				it { is_expected.to eq(foo: 'bar', bar: 'bar', baz: 'foo') }
+				it do
+					is_expected.to eq coerced_params.merge(
+						created_at: coerced_time,
+						updated_at: Time.new(2018, 5, 7, 21, 49),
+						enabled: true
+					)
+				end
 			end
+
+			context 'params is empty' do
+				let(:params) { {} }
+
+				it do
+					is_expected.to eq(
+						bar: nil, baz: 'qwerty',
+						created_at: default_created_at,
+						updated_at: default_created_at,
+						count: 0, price: 2.5, enabled: false
+					)
+				end
+			end
+		end
+
+		describe ':key option' do
+			let(:form_class) do
+				Class.new(described_class) do
+					field :foo, key: :bar
+					field :bar
+					field :baz, key: :foo
+				end
+			end
+
+			let(:params) { { foo: 'foo', bar: 'bar', baz: 'baz' } }
+
+			it { is_expected.to eq(foo: 'bar', bar: 'bar', baz: 'foo') }
 		end
 
 		describe 'inheritance' do
@@ -268,11 +271,7 @@ describe Formalism::Form do
 				end
 			end
 
-			let(:form) { form_class.new(params) }
-
 			let(:params) { { foo: 1, bar: '2', baz: Time.now } }
-
-			subject { form.fields }
 
 			it { is_expected.to eq(foo: 1, bar: '2') }
 		end
