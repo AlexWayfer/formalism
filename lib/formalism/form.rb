@@ -96,10 +96,11 @@ module Formalism
 
 		def fill_fields
 			self.class.fields.each do |name, options|
-				next unless @params.key?(name) || options.key?(:default)
+				key = options.fetch(:key, name)
+				next unless @params.key?(key) || options.key?(:default)
 				default = options[:default]
 				send "#{name}=", @params.fetch(
-					name, default.is_a?(Proc) ? instance_exec(&default) : default
+					key, default.is_a?(Proc) ? instance_exec(&default) : default
 				)
 			end
 		end

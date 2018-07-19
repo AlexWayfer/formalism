@@ -192,7 +192,7 @@ describe Formalism::Form do
 				)
 			end
 
-			describe 'default' do
+			describe ':default option' do
 				default_created_at = Time.new(2018, 5, 7, 14, 40)
 
 				let(:form_class) do
@@ -238,6 +238,20 @@ describe Formalism::Form do
 						)
 					end
 				end
+			end
+
+			describe ':key option' do
+				let(:form_class) do
+					Class.new(described_class) do
+						field :foo, key: :bar
+						field :bar
+						field :baz, key: :foo
+					end
+				end
+
+				let(:params) { { foo: 'foo', bar: 'bar', baz: 'baz' } }
+
+				it { is_expected.to eq(foo: 'bar', bar: 'bar', baz: 'foo') }
 			end
 		end
 
