@@ -360,21 +360,75 @@ describe Formalism::Form do
 	describe '#run' do
 		subject { album_form.run }
 
-		context 'correct params' do
-			let(:params) { correct_album_params }
+		describe '#success?' do
+			subject { super().success? }
 
-			it 'runs execute and returns true' do
-				is_expected.to be true
-				expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+			context 'correct params' do
+				let(:params) { correct_album_params }
+
+				after do
+					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+				end
+
+				it { is_expected.to be true }
+			end
+
+			context 'incorrect params' do
+				let(:params) { { year: 3018 } }
+
+				after do
+					expect(Album.all).to be_empty
+				end
+
+				it { is_expected.to be false }
 			end
 		end
 
-		context 'incorrect params' do
-			let(:params) { { year: 3018 } }
+		describe '#errors' do
+			subject { super().errors }
 
-			it 'does not run execute and returns false' do
-				is_expected.to be false
-				expect(Album.all).to be_empty
+			context 'correct params' do
+				let(:params) { correct_album_params }
+
+				after do
+					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+				end
+
+				it { is_expected.to be_empty }
+			end
+
+			context 'incorrect params' do
+				let(:params) { { year: 3018 } }
+
+				after do
+					expect(Album.all).to be_empty
+				end
+
+				it { is_expected.to be_any }
+			end
+		end
+
+		describe '#data' do
+			subject { super().data }
+
+			context 'correct params' do
+				let(:params) { correct_album_params }
+
+				after do
+					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+				end
+
+				it { is_expected.to eq Album.new(params.merge(id: 1)) }
+			end
+
+			context 'incorrect params' do
+				let(:params) { { year: 3018 } }
+
+				after do
+					expect(Album.all).to be_empty
+				end
+
+				it { is_expected.to be_nil }
 			end
 		end
 	end
@@ -382,21 +436,27 @@ describe Formalism::Form do
 	describe '.run' do
 		subject { AlbumForm.run(params) }
 
-		context 'correct params' do
-			let(:params) { correct_album_params }
+		describe '#success?' do
+			subject { super().success? }
 
-			it 'runs execute and returns true' do
-				is_expected.to be true
-				expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+			context 'correct params' do
+				let(:params) { correct_album_params }
+
+				after do
+					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+				end
+
+				it { is_expected.to be true }
 			end
-		end
 
-		context 'incorrect params' do
-			let(:params) { { year: 3018 } }
+			context 'incorrect params' do
+				let(:params) { { year: 3018 } }
 
-			it 'does not run execute and returns false' do
-				is_expected.to be false
-				expect(Album.all).to be_empty
+				after do
+					expect(Album.all).to be_empty
+				end
+
+				it { is_expected.to be false }
 			end
 		end
 	end
@@ -580,40 +640,47 @@ describe Formalism::Form do
 		describe '#run' do
 			subject { album_with_nested_form.run }
 
-			context 'correct params' do
-				let(:params) do
-					correct_album_params.merge(
-						artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
-					)
-				end
+			describe '#success?' do
+				subject { super().success? }
 
-				it 'runs execute of self and nested forms and returns true' do
-					is_expected.to be true
-					artist = Artist.new(id: 1, name: 'Bar')
-					tag = Tag.new(id: 1, name: 'Blues')
-					label = Label.new(id: 1, name: 'RAM')
-					expect(Album.all).to eq([
-						Album.new(
-							correct_album_params.merge(
-								id: 1, artist: artist, tag: tag, label: label
-							)
+				context 'correct params' do
+					let(:params) do
+						correct_album_params.merge(
+							artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
 						)
-					])
-					expect(Artist.all).to eq([artist])
-					expect(Tag.all).to eq([tag])
-					expect(Label.all).to eq([label])
+					end
+
+					after do
+						artist = Artist.new(id: 1, name: 'Bar')
+						tag = Tag.new(id: 1, name: 'Blues')
+						label = Label.new(id: 1, name: 'RAM')
+
+						expect(Album.all).to eq([
+							Album.new(
+								correct_album_params.merge(
+									id: 1, artist: artist, tag: tag, label: label
+								)
+							)
+						])
+						expect(Artist.all).to eq([artist])
+						expect(Tag.all).to eq([tag])
+						expect(Label.all).to eq([label])
+					end
+
+					it { is_expected.to be true }
 				end
-			end
 
-			context 'incorrect params' do
-				let(:params) { { title: '', year: 2018, artist: { name: '' } } }
+				context 'incorrect params' do
+					let(:params) { { title: '', year: 2018, artist: { name: '' } } }
 
-				it 'does not run execute of self and nested forms and returns false' do
-					is_expected.to be false
-					expect(Album.all).to be_empty
-					expect(Artist.all).to be_empty
-					expect(Label.all).to be_empty
-					expect(album_with_nested_form.tag).to eq(Tag.new(name: 'default'))
+					after do
+						expect(Album.all).to be_empty
+						expect(Artist.all).to be_empty
+						expect(Label.all).to be_empty
+						expect(album_with_nested_form.tag).to eq(Tag.new(name: 'default'))
+					end
+
+					it { is_expected.to be false }
 				end
 			end
 		end

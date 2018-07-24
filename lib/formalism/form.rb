@@ -70,6 +70,10 @@ module Formalism
 			@fields ||= {}
 		end
 
+		def errors
+			@errors ||= Set.new
+		end
+
 		def valid?
 			errors.clear
 			nested_forms.each_value(&:valid?)
@@ -79,15 +83,10 @@ module Formalism
 			true
 		end
 
-		def errors
-			@errors ||= Set.new
-		end
-
 		def run
-			return false unless valid?
+			return Result.new(errors) unless valid?
 			nested_forms.each_value(&:run)
-			super
-			true
+			Result.new(errors, super)
 		end
 
 		private
@@ -128,5 +127,21 @@ module Formalism
 				&options.fetch(:initialize, ->(form) { form.new(params[name]) })
 			)
 		end
+
+		## Private class for results
+		class Result
+			attr_reader :errors, :data
+
+			def initialize(errors, data = nil)
+				@errors = errors
+				@data = data
+			end
+
+			def success?
+				@errors.empty?
+			end
+		end
+
+		private_constant :Result
 	end
 end
