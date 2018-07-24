@@ -333,30 +333,6 @@ describe Formalism::Form do
 		end
 	end
 
-	describe '#errors' do
-		before { album_form.valid? }
-		subject { album_form.errors }
-
-		context 'correct params' do
-			let(:params) { correct_album_params }
-
-			it { is_expected.to be_empty }
-		end
-
-		context 'incorrect params' do
-			let(:params) { { year: 3018 } }
-
-			it do
-				is_expected.to eq(
-					[
-						'Album title is not present',
-						"Album year is not in #{YEAR_RANGE}"
-					].to_set
-				)
-			end
-		end
-	end
-
 	describe '#run' do
 		subject { album_form.run }
 
@@ -404,7 +380,12 @@ describe Formalism::Form do
 					expect(Album.all).to be_empty
 				end
 
-				it { is_expected.to be_any }
+				it do
+					is_expected.to eq [
+						'Album title is not present',
+						"Album year is not in #{YEAR_RANGE}"
+					].to_set
+				end
 			end
 		end
 
@@ -613,30 +594,6 @@ describe Formalism::Form do
 			end
 		end
 
-		describe '#errors' do
-			before { album_with_nested_form.valid? }
-			subject { album_with_nested_form.errors }
-
-			context 'correct params' do
-				let(:params) { correct_album_params.merge(artist: { name: 'Bar' }) }
-
-				it { is_expected.to be_empty }
-			end
-
-			context 'incorrect params' do
-				let(:params) { { title: '', year: 2018, artist: { name: '' } } }
-
-				it do
-					is_expected.to eq(
-						[
-							'Album title is not present', 'Artist name is not present',
-							'Compositor name is not present'
-						].to_set
-					)
-				end
-			end
-		end
-
 		describe '#run' do
 			subject { album_with_nested_form.run }
 
@@ -681,6 +638,55 @@ describe Formalism::Form do
 					end
 
 					it { is_expected.to be false }
+				end
+			end
+
+			describe '#errors' do
+				subject { super().errors }
+
+				context 'correct params' do
+					let(:params) do
+						correct_album_params.merge(
+							artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
+						)
+					end
+
+					after do
+						artist = Artist.new(id: 1, name: 'Bar')
+						tag = Tag.new(id: 1, name: 'Blues')
+						label = Label.new(id: 1, name: 'RAM')
+
+						expect(Album.all).to eq([
+							Album.new(
+								correct_album_params.merge(
+									id: 1, artist: artist, tag: tag, label: label
+								)
+							)
+						])
+						expect(Artist.all).to eq([artist])
+						expect(Tag.all).to eq([tag])
+						expect(Label.all).to eq([label])
+					end
+
+					it { is_expected.to be_empty }
+				end
+
+				context 'incorrect params' do
+					let(:params) { { title: '', year: 2018, artist: { name: '' } } }
+
+					after do
+						expect(Album.all).to be_empty
+						expect(Artist.all).to be_empty
+						expect(Label.all).to be_empty
+						expect(album_with_nested_form.tag).to eq(Tag.new(name: 'default'))
+					end
+
+					it do
+						is_expected.to eq [
+							'Album title is not present', 'Artist name is not present',
+							'Compositor name is not present'
+						].to_set
+					end
 				end
 			end
 		end

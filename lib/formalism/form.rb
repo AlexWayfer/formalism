@@ -70,10 +70,6 @@ module Formalism
 			@fields ||= {}
 		end
 
-		def errors
-			@errors ||= Set.new
-		end
-
 		def valid?
 			errors.clear
 			nested_forms.each_value(&:valid?)
@@ -90,6 +86,10 @@ module Formalism
 		end
 
 		private
+
+		def errors
+			@errors ||= Set.new
+		end
 
 		def validate; end
 
