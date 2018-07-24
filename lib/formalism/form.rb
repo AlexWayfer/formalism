@@ -48,6 +48,10 @@ module Formalism
 			def inherited(child)
 				child.fields.merge!(fields)
 			end
+
+			def run(*args)
+				new(*args).run
+			end
 		end
 
 		attr_reader :params
