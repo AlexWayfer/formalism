@@ -408,8 +408,8 @@ describe Formalism::Form do
 			end
 		end
 
-		describe '#data' do
-			subject { super().data }
+		describe '#result' do
+			subject { super().result }
 
 			context 'correct params' do
 				let(:params) { correct_album_params }

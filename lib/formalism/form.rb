@@ -84,9 +84,9 @@ module Formalism
 		end
 
 		def run
-			return Result.new(errors) unless valid?
+			return Outcome.new(errors) unless valid?
 			nested_forms.each_value(&:run)
-			Result.new(errors, super)
+			Outcome.new(errors, super)
 		end
 
 		private
@@ -129,12 +129,12 @@ module Formalism
 		end
 
 		## Private class for results
-		class Result
-			attr_reader :errors, :data
+		class Outcome
+			attr_reader :errors, :result
 
-			def initialize(errors, data = nil)
+			def initialize(errors, result = nil)
 				@errors = errors
-				@data = data
+				@result = result
 			end
 
 			def success?
@@ -142,6 +142,6 @@ module Formalism
 			end
 		end
 
-		private_constant :Result
+		private_constant :Outcome
 	end
 end
