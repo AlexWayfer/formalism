@@ -11,4 +11,6 @@ if ENV['CODECOV']
 	SimpleCov.formatter = SimpleCov::Formatter::Codecov
 end
 
+require 'pry-byebug'
+
 require_relative '../lib/formalism'
