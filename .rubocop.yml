@@ -6,6 +6,8 @@ Layout/IndentArray:
   EnforcedStyle: consistent
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
+Layout/FirstParameterIndentation:
+  EnforcedStyle: consistent
 
 Metrics/BlockLength:
   Exclude:
