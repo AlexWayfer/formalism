@@ -8,18 +8,14 @@ module Formalism
 	## Class for forms
 	class Form < Action
 		class << self
-			def fields
-				@fields ||= {}
-			end
-
-			def nested_forms
-				@nested_forms ||= {}
+			def fields_and_nested_forms
+				@fields_and_nested_forms ||= {}
 			end
 
 			def field(name, type = nil, **options)
 				Coercion.check type unless type.nil?
 
-				fields[name] = options.merge(type: type)
+				fields_and_nested_forms[name] = options.merge(type: type)
 
 				attr_reader name
 
@@ -34,20 +30,22 @@ module Formalism
 
 			def nested(name, form = nil, **options)
 				unless form || options.key?(:initialize)
-					raise(
-						ArgumentError,
-						'Neither form class nor initialize block is not present'
-					)
+					raise ArgumentError, 'Neither form class nor initialize block ' \
+						'is not present'
 				end
 
-				nested_forms[name] = options.merge(form: form)
+				instance_variable = options[:instance_variable] ||= name
+				fields_and_nested_forms[name] = options.merge(form: form)
 
 				define_method("#{name}_form") { nested_forms[name] }
-				define_method(name) { nested_forms[name].public_send(name) }
+
+				define_method(name) do
+					nested_forms[name].public_send(instance_variable)
+				end
 			end
 
 			def inherited(child)
-				child.fields.merge!(fields)
+				child.fields_and_nested_forms.merge!(fields_and_nested_forms)
 			end
 
 			def run(*args)
@@ -62,9 +60,7 @@ module Formalism
 		def initialize(params = {})
 			@params = params.deep_dup || {}
 
-			fill_fields
-
-			fill_nested_forms
+			fill_fields_and_nested_forms
 		end
 
 		def fields
@@ -100,8 +96,9 @@ module Formalism
 			@nested_forms ||= {}
 		end
 
-		def fill_fields
-			self.class.fields.each do |name, options|
+		def fill_fields_and_nested_forms
+			self.class.fields_and_nested_forms.each do |name, options|
+				next fill_nested_form name, options if options.key?(:form)
 				key = options.fetch(:key, name)
 				next unless @params.key?(key) || options.key?(:default)
 				default = options[:default]
@@ -111,17 +108,15 @@ module Formalism
 			end
 		end
 
-		def fill_nested_forms
-			self.class.nested_forms.each do |name, options|
-				form = initialize_nested_form(name, options)
-				next unless form
-				nested_forms[name] = form
-				next if @params.key?(name) || options.key?(:initialize)
-				default = options[:default]
-				form.instance_variable_set(
-					"@#{name}", default.is_a?(Proc) ? instance_exec(&default) : default
-				)
-			end
+		def fill_nested_form(name, options)
+			return unless (form = initialize_nested_form(name, options))
+			nested_forms[name] = form
+			return if @params.key?(name) || options.key?(:initialize)
+			default = options[:default]
+			form.instance_variable_set(
+				"@#{options[:instance_variable]}",
+				default.is_a?(Proc) ? instance_exec(&default) : default
+			)
 		end
 
 		def initialize_nested_form(name, options)

@@ -41,7 +41,7 @@ describe Formalism::Form do
 		)
 
 		stub_const(
-			'Album', Model.new(:id, :title, :year, :artist, :tag, :label)
+			'Album', Model.new(:id, :title, :year, :artist, :tag, :label, :genre)
 		)
 
 		## https://github.com/bbatsov/rubocop/issues/5830
@@ -535,6 +535,8 @@ describe Formalism::Form do
 					nested :label, LabelForm,
 						initialize: ->(form) { form.new(params[:label_name]) }
 
+					field :genre, default: -> { label }
+
 					nested :compositor, initialize: (
 						proc do
 							(artist_form.valid? ? ArtistForm : CompositorForm)
@@ -543,6 +545,8 @@ describe Formalism::Form do
 					)
 
 					nested :update_something, initialize: ->(_form) { nil }
+
+					nested :hashtag, TagForm, instance_variable: :tag
 
 					private
 
