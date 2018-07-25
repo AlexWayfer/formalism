@@ -2,6 +2,7 @@
 
 require 'gorilla_patch/deep_dup'
 require_relative 'coercion'
+require_relative 'form/outcome'
 
 module Formalism
 	## Class for forms
@@ -74,7 +75,7 @@ module Formalism
 			errors.clear
 			nested_forms.each_value(&:valid?)
 			validate
-			errors.merge(nested_forms.each_value.map(&:errors)).flatten!
+			merge_errors_of_nested_forms
 			return false if errors.any?
 			true
 		end
@@ -85,11 +86,13 @@ module Formalism
 			Outcome.new(errors, super)
 		end
 
-		private
+		protected
 
 		def errors
 			@errors ||= Set.new
 		end
+
+		private
 
 		def validate; end
 
@@ -128,20 +131,8 @@ module Formalism
 			)
 		end
 
-		## Private class for results
-		class Outcome
-			attr_reader :errors, :result
-
-			def initialize(errors, result = nil)
-				@errors = errors
-				@result = result
-			end
-
-			def success?
-				@errors.empty?
-			end
+		def merge_errors_of_nested_forms
+			nested_forms.each_value { |nested_form| errors.merge(nested_form.errors) }
 		end
-
-		private_constant :Outcome
 	end
 end
