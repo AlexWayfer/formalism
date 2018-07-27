@@ -46,10 +46,6 @@ module Formalism
 			def inherited(child)
 				child.fields_and_nested_forms.merge!(fields_and_nested_forms)
 			end
-
-			def run(*args)
-				new(*args).run
-			end
 		end
 
 		def initialize(params = {})

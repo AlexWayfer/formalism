@@ -28,9 +28,7 @@ describe Formalism::Action do
 		end
 	end
 
-	describe '#run' do
-		subject { test_action.run }
-
+	shared_examples 'run' do
 		context 'with correct value' do
 			let(:params) { { string: +'foo' } }
 
@@ -46,5 +44,17 @@ describe Formalism::Action do
 				)
 			end
 		end
+	end
+
+	describe '#run' do
+		subject { test_action.run }
+
+		include_examples 'run'
+	end
+
+	describe '.run' do
+		subject { test_action_class.run(params) }
+
+		include_examples 'run'
 	end
 end

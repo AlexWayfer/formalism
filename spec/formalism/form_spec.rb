@@ -400,34 +400,6 @@ describe Formalism::Form do
 		end
 	end
 
-	describe '.run' do
-		subject { AlbumForm.run(params) }
-
-		describe '#success?' do
-			subject { super().success? }
-
-			context 'correct params' do
-				let(:params) { correct_album_params }
-
-				after do
-					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
-				end
-
-				it { is_expected.to be true }
-			end
-
-			context 'incorrect params' do
-				let(:params) { { year: 3018 } }
-
-				after do
-					expect(Album.all).to be_empty
-				end
-
-				it { is_expected.to be false }
-			end
-		end
-	end
-
 	describe '.nested' do
 		before do
 			stub_const(
