@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'gorilla_patch/deep_dup'
 require_relative 'coercion'
 require_relative 'form/outcome'
 
@@ -53,12 +52,8 @@ module Formalism
 			end
 		end
 
-		attr_reader :params
-
-		using GorillaPatch::DeepDup
-
 		def initialize(params = {})
-			@params = params.deep_dup || {}
+			super
 
 			fill_fields_and_nested_forms
 		end

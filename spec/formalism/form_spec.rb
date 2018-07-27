@@ -281,20 +281,6 @@ describe Formalism::Form do
 
 	let(:correct_album_params) { { title: 'Foo', year: 2018 } }
 
-	describe '#params' do
-		subject { album_form.params }
-		let(:params) { correct_album_params }
-
-		it { is_expected.to eq params }
-		it { is_expected.not_to be params }
-
-		context 'params does not received' do
-			let(:params) { nil }
-
-			it { is_expected.to eq({}) }
-		end
-	end
-
 	describe '#fields' do
 		subject { album_form.fields }
 

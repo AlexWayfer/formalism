@@ -1,31 +1,44 @@
 # frozen_string_literal: true
 
 describe Formalism::Action do
-	subject(:test_action) do
+	let(:test_action_class) do
 		Class.new(described_class) do
-			def initialize(string)
-				@string = string
-			end
-
 			private
 
 			def execute
-				@string.upcase
+				params[:string].upcase
 			end
 		end
 	end
 
+	subject(:test_action) { test_action_class.new(params) }
+
+	describe '#params' do
+		subject { test_action.params }
+
+		let(:params) { { string: 'foo' } }
+
+		it { is_expected.to eq params }
+		it { is_expected.not_to be params }
+
+		context 'params does not received' do
+			let(:params) { nil }
+
+			it { is_expected.to eq({}) }
+		end
+	end
+
 	describe '#run' do
-		subject { test_action.new(string).run }
+		subject { test_action.run }
 
 		context 'with correct value' do
-			let(:string) { +'foo' }
+			let(:params) { { string: +'foo' } }
 
 			it { is_expected.to eq 'FOO' }
 		end
 
 		context 'with incorrect value' do
-			let(:string) { 42 }
+			let(:params) { { string: 42 } }
 
 			it do
 				expect { subject }.to raise_error(
