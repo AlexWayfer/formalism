@@ -509,8 +509,11 @@ describe Formalism::Form do
 					private
 
 					def execute
+						artist_form.run
 						@album.artist = artist
+						tag_form.run
 						@album.tag = tag
+						label_form.run
 						@album.label = label
 						super
 					end

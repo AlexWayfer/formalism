@@ -69,7 +69,6 @@ module Formalism
 
 		def run
 			return Outcome.new(errors) unless valid?
-			nested_forms.each_value(&:run)
 			Outcome.new(errors, super)
 		end
 
