@@ -204,6 +204,7 @@ describe Formalism::Form do
 					field :foo
 					field :bar, Integer, default: nil
 					field :baz, String, default: 'qwerty'
+					field :name, String, default: nil
 					field :created_at, Time, default: -> { default_created_at }
 					field :updated_at, Time, default: -> { created_at }
 					field :count, :integer, default: 0
@@ -215,14 +216,17 @@ describe Formalism::Form do
 			context 'params is filled' do
 				let(:params) do
 					not_coerced_params.merge(
+						name: 'Alex',
 						created_at: not_coerced_time,
 						updated_at: '2018-05-07 21:49',
-						enabled: 'true', qux: 4
+						enabled: 'true',
+						qux: 4
 					)
 				end
 
 				it do
 					is_expected.to eq coerced_params.merge(
+						name: 'Alex',
 						created_at: coerced_time,
 						updated_at: Time.new(2018, 5, 7, 21, 49),
 						enabled: true
@@ -235,10 +239,14 @@ describe Formalism::Form do
 
 				it do
 					is_expected.to eq(
-						bar: nil, baz: 'qwerty',
+						bar: nil,
+						baz: 'qwerty',
+						name: nil,
 						created_at: default_created_at,
 						updated_at: default_created_at,
-						count: 0, price: 2.5, enabled: false
+						count: 0,
+						price: 2.5,
+						enabled: false
 					)
 				end
 			end

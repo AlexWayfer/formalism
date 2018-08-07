@@ -39,7 +39,7 @@ module Formalism
 		end
 
 		def to_string
-			@value.to_s
+			@value&.to_s
 		end
 
 		def to_integer
