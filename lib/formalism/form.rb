@@ -16,12 +16,11 @@ module Formalism
 
 				fields_and_nested_forms[name] = options.merge(type: type)
 
-				attr_reader name
+				define_method(name) { fields[name] }
 
 				private(
 					define_method("#{name}=") do |value|
 						value = Coercion.new(value, type).result
-						instance_variable_set "@#{name}", value
 						fields[name] = value
 					end
 				)
