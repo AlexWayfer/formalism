@@ -51,11 +51,6 @@ describe Formalism::Form do
 				field :title
 				field :year, Integer
 
-				def initialize(params)
-					super
-					@album = Album.new(fields)
-				end
-
 				private
 
 				def validate
@@ -66,7 +61,7 @@ describe Formalism::Form do
 				end
 
 				def execute
-					@album.save
+					@album = Album.create(fields_and_nested_forms)
 				end
 			end
 		)
@@ -438,7 +433,7 @@ describe Formalism::Form do
 					end
 
 					def execute
-						@artist = Artist.find_or_create(fields)
+						@artist = Artist.find_or_create(fields_and_nested_forms)
 					end
 				end
 			)
@@ -452,7 +447,7 @@ describe Formalism::Form do
 					private
 
 					def execute
-						@tag = Tag.find_or_create(fields)
+						@tag = Tag.find_or_create(fields_and_nested_forms)
 					end
 				end
 			)
@@ -487,7 +482,7 @@ describe Formalism::Form do
 					end
 
 					def execute
-						@compositor = Compositor.find_or_create(fields)
+						@compositor = Compositor.find_or_create(fields_and_nested_forms)
 					end
 				end
 			)
@@ -508,21 +503,18 @@ describe Formalism::Form do
 							(artist_form.valid? ? ArtistForm : CompositorForm)
 								.new(params[artist_form.valid? ? :artist : :compositor])
 						end
-					)
+					), merge: false
 
 					nested :update_something, initialize: ->(_form) { nil }
 
-					nested :hashtag, TagForm, instance_variable: :tag
+					nested :hashtag, TagForm, instance_variable: :tag, merge: false
 
 					private
 
 					def execute
 						artist_form.run
-						@album.artist = artist
 						tag_form.run
-						@album.tag = tag
 						label_form.run
-						@album.label = label
 						super
 					end
 

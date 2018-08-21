@@ -85,6 +85,18 @@ module Formalism
 			@nested_forms ||= {}
 		end
 
+		def fields_and_nested_forms
+			merging_nested_forms = nested_forms.select do |name, _nested_form|
+				self.class.fields_and_nested_forms[name].fetch(:merge, true)
+			end
+
+			fields.merge(
+				merging_nested_forms
+					.map { |name, _nested_form| [name, public_send(name)] }
+					.to_h
+			)
+		end
+
 		def fill_fields_and_nested_forms
 			self.class.fields_and_nested_forms.each do |name, options|
 				next fill_nested_form name, options if options.key?(:form)
