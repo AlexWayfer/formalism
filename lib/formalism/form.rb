@@ -86,14 +86,16 @@ module Formalism
 		end
 
 		def fields_and_nested_forms
-			merging_nested_forms = nested_forms.select do |name, _nested_form|
-				self.class.fields_and_nested_forms[name].fetch(:merge, true)
-			end
+			merging_fields, merging_nested_forms =
+				[fields, nested_forms].map do |hash|
+					hash.select do |name, _value|
+						self.class.fields_and_nested_forms[name].fetch(:merge, true)
+					end
+				end
 
-			fields.merge(
+			merging_fields.merge(
 				merging_nested_forms
-					.map { |name, _nested_form| [name, public_send(name)] }
-					.to_h
+					.map { |name, _nested_form| [name, public_send(name)] }.to_h
 			)
 		end
 

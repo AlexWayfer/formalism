@@ -30,9 +30,16 @@ describe Formalism::Form do
 					end
 				end
 
+				def id
+					@id ||= all.last&.id.to_i + 1
+				end
+
+				def id=(_value)
+					raise ArgumentError, 'id is a restricted primary key'
+				end
+
 				def save
 					all = self.class.all
-					self.id ||= all.last&.id.to_i + 1
 					all.delete_if { |record| record.id == id }
 					all.push self
 					self
@@ -41,13 +48,14 @@ describe Formalism::Form do
 		)
 
 		stub_const(
-			'Album', Model.new(:id, :title, :year, :artist, :tag, :label, :genre)
+			'Album', Model.new(:title, :year, :artist, :tag, :label, :genre)
 		)
 
 		## https://github.com/bbatsov/rubocop/issues/5830
 		# rubocop:disable Lint/AccessModifierIndentation
 		stub_const(
 			'AlbumForm', Class.new(described_class) do
+				field :id, Integer, merge: false
 				field :title
 				field :year, Integer
 
@@ -71,6 +79,7 @@ describe Formalism::Form do
 	describe '.field' do
 		let(:form_class) do
 			Class.new(described_class) do
+				field :id, Integer, merge: false
 				field :foo
 				field :bar, Integer
 				field :baz, String
@@ -78,6 +87,12 @@ describe Formalism::Form do
 				field :count, :integer
 				field :price, Float
 				field :enabled, :boolean
+
+				private
+
+				def execute
+					@entity = Model.new(:foo, :bar).create(fields_and_nested_forms)
+				end
 			end
 		end
 
@@ -278,6 +293,14 @@ describe Formalism::Form do
 
 			it { is_expected.to eq(foo: 1, bar: '2') }
 		end
+
+		describe ':merge option' do
+			subject { form.run }
+
+			let(:params) { { id: 2 } }
+
+			it { expect { subject }.not_to raise_error }
+		end
 	end
 
 	subject(:album_form) { AlbumForm.new(params) }
@@ -332,7 +355,7 @@ describe Formalism::Form do
 				let(:params) { correct_album_params }
 
 				after do
-					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+					expect(Album.all).to eq([Album.new(params)])
 				end
 
 				it { is_expected.to be true }
@@ -356,7 +379,7 @@ describe Formalism::Form do
 				let(:params) { correct_album_params }
 
 				after do
-					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+					expect(Album.all).to eq([Album.new(params)])
 				end
 
 				it { is_expected.to be_empty }
@@ -385,10 +408,10 @@ describe Formalism::Form do
 				let(:params) { correct_album_params }
 
 				after do
-					expect(Album.all).to eq([Album.new(params.merge(id: 1))])
+					expect(Album.all).to eq([Album.new(params)])
 				end
 
-				it { is_expected.to eq Album.new(params.merge(id: 1)) }
+				it { is_expected.to eq Album.new(params) }
 			end
 
 			context 'incorrect params' do
@@ -406,15 +429,15 @@ describe Formalism::Form do
 	describe '.nested' do
 		before do
 			stub_const(
-				'Artist', Model.new(:id, :name)
+				'Artist', Model.new(:name)
 			)
 
 			stub_const(
-				'Tag', Model.new(:id, :name)
+				'Tag', Model.new(:name)
 			)
 
 			stub_const(
-				'Label', Model.new(:id, :name)
+				'Label', Model.new(:name)
 			)
 
 			## https://github.com/bbatsov/rubocop/issues/5830
@@ -573,14 +596,14 @@ describe Formalism::Form do
 					end
 
 					after do
-						artist = Artist.new(id: 1, name: 'Bar')
-						tag = Tag.new(id: 1, name: 'Blues')
-						label = Label.new(id: 1, name: 'RAM')
+						artist = Artist.new(name: 'Bar')
+						tag = Tag.new(name: 'Blues')
+						label = Label.new(name: 'RAM')
 
 						expect(Album.all).to eq([
 							Album.new(
 								correct_album_params.merge(
-									id: 1, artist: artist, tag: tag, label: label
+									artist: artist, tag: tag, label: label
 								)
 							)
 						])
@@ -617,14 +640,14 @@ describe Formalism::Form do
 					end
 
 					after do
-						artist = Artist.new(id: 1, name: 'Bar')
-						tag = Tag.new(id: 1, name: 'Blues')
-						label = Label.new(id: 1, name: 'RAM')
+						artist = Artist.new(name: 'Bar')
+						tag = Tag.new(name: 'Blues')
+						label = Label.new(name: 'RAM')
 
 						expect(Album.all).to eq([
 							Album.new(
 								correct_album_params.merge(
-									id: 1, artist: artist, tag: tag, label: label
+									artist: artist, tag: tag, label: label
 								)
 							)
 						])
