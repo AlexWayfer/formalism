@@ -1,60 +1,21 @@
 # frozen_string_literal: true
 
-require_relative 'coercion'
+require_relative 'form/fields'
 require_relative 'form/outcome'
 
 module Formalism
 	## Class for forms
 	class Form < Action
-		class << self
-			def fields_and_nested_forms
-				@fields_and_nested_forms ||= {}
-			end
+		include Form::Fields
 
-			def field(name, type = nil, **options)
-				Coercion.check type unless type.nil?
-
-				fields_and_nested_forms[name] = options.merge(type: type)
-
-				define_method(name) { fields[name] }
-
-				private(
-					define_method("#{name}=") do |value|
-						value = Coercion.new(value, type).result
-						fields[name] = value
-					end
-				)
-			end
-
-			def nested(name, form = nil, **options)
-				unless form || options.key?(:initialize)
-					raise ArgumentError, 'Neither form class nor initialize block ' \
-						'is not present'
-				end
-
-				instance_variable = options[:instance_variable] ||= name
-				fields_and_nested_forms[name] = options.merge(form: form)
-
-				define_method("#{name}_form") { nested_forms[name] }
-
-				define_method(name) do
-					nested_forms[name].public_send(instance_variable)
-				end
-			end
-
-			def inherited(child)
-				child.fields_and_nested_forms.merge!(fields_and_nested_forms)
-			end
+		def self.inherited(child)
+			child.fields_and_nested_forms.merge!(fields_and_nested_forms)
 		end
 
 		def initialize(params = {})
 			super
 
 			fill_fields_and_nested_forms
-		end
-
-		def fields
-			@fields ||= {}
 		end
 
 		def valid?
@@ -80,24 +41,6 @@ module Formalism
 		private
 
 		def validate; end
-
-		def nested_forms
-			@nested_forms ||= {}
-		end
-
-		def fields_and_nested_forms
-			merging_fields, merging_nested_forms =
-				[fields, nested_forms].map do |hash|
-					hash.select do |name, _value|
-						self.class.fields_and_nested_forms[name].fetch(:merge, true)
-					end
-				end
-
-			merging_fields.merge(
-				merging_nested_forms
-					.map { |name, _nested_form| [name, public_send(name)] }.to_h
-			)
-		end
 
 		def fill_fields_and_nested_forms
 			self.class.fields_and_nested_forms.each do |name, options|
