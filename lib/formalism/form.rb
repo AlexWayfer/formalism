@@ -57,10 +57,10 @@ module Formalism
 		def fill_nested_form(name, options)
 			return unless (form = initialize_nested_form(name, options))
 			nested_forms[name] = form
-			return if @params.key?(name) || options.key?(:initialize)
+			return if @params.key?(name) || !options.key?(:default)
 			default = options[:default]
 			form.instance_variable_set(
-				"@#{options[:instance_variable]}",
+				options[:instance_variable_name],
 				default.is_a?(Proc) ? instance_exec(&default) : default
 			)
 		end

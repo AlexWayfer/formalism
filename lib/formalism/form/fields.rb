@@ -39,13 +39,22 @@ module Formalism
 							'is not present'
 					end
 
-					instance_variable = options[:instance_variable] ||= name
+					options[:instance_variable] ||= name
+					options[:instance_variable_name] = "@#{options[:instance_variable]}"
 					fields_and_nested_forms[name] = options.merge(form: form)
 
+					define_nested_form_methods(name)
+				end
+
+				private
+
+				def define_nested_form_methods(name)
 					define_method("#{name}_form") { nested_forms[name] }
 
 					define_method(name) do
-						nested_forms[name].public_send(instance_variable)
+						nested_forms[name].public_send(
+							self.class.fields_and_nested_forms[name][:instance_variable]
+						)
 					end
 				end
 			end
@@ -65,17 +74,27 @@ module Formalism
 			end
 
 			def fields_and_nested_forms
-				merging_fields, merging_nested_forms =
-					[fields, nested_forms].map do |hash|
-						hash.select do |name, _value|
-							self.class.fields_and_nested_forms[name].fetch(:merge, true)
-						end
-					end
+				merging_fields = select_for_merging :fields
+				merging_nested_forms = select_for_merging :nested_forms
 
 				merging_fields.merge(
 					merging_nested_forms
-						.map { |name, _nested_form| [name, public_send(name)] }.to_h
+						.map { |name, _nested_form| [name, public_send(name)] }
+						.to_h
 				)
+			end
+
+			def select_for_merging(type)
+				send(type).select do |name, value|
+					merge_option =
+						self.class.fields_and_nested_forms[name].fetch(:merge, true)
+
+					next merge_option unless type == :nested_form
+
+					merge_option && value.instance_variable_defined?(
+						self.class.fields_and_nested_forms[name][:instance_variable_name]
+					)
+				end
 			end
 		end
 	end
