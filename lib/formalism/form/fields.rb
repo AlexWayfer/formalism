@@ -11,7 +11,13 @@ module Formalism
 				def included(something)
 					something.extend ClassMethods
 
-					something.fields_and_nested_forms.merge!(fields_and_nested_forms)
+					fields_and_nested_forms.each do |name, options|
+						if options.key?(:form)
+							something.nested name, options[:form], **options
+						else
+							something.field name, options[:type], **options
+						end
+					end
 				end
 
 				def fields_and_nested_forms

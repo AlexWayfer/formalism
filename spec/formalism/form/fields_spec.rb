@@ -104,45 +104,101 @@ describe Formalism::Form::Fields do
 			)
 		end
 
-		subject(:form) { FormWithDefaults.new(params) }
-
 		describe '#fields_and_nested_forms' do
-			subject { super().send :fields_and_nested_forms }
+			subject { form.send :fields_and_nested_forms }
 
-			context 'with params' do
-				let(:params) do
-					{
-						one: :first,
-						two: :second,
-						inner: { name: :regular },
-						inner_with_default: { name: :another },
-						three: :third,
-						four: :fourth
-					}
+			let(:params) do
+				{
+					one: :first,
+					two: :second,
+					inner: { name: :regular },
+					inner_with_default: { name: :another },
+					three: :third,
+					four: :fourth
+				}
+			end
+
+			context 'regular' do
+				let(:form) { FormWithDefaults.new(params) }
+
+				context 'with params' do
+					it do
+						is_expected.to eq(
+							one: :first,
+							two: :second,
+							inner: Inner.new(name: 'regular'),
+							inner_with_default: Inner.new(name: :another),
+							three: :third,
+							four: :fourth
+						)
+					end
 				end
 
-				it do
-					is_expected.to eq(
-						one: :first,
-						two: :second,
-						inner: Inner.new(name: 'regular'),
-						inner_with_default: Inner.new(name: :another),
-						three: :third,
-						four: :fourth
-					)
+				context 'without params' do
+					let(:params) { {} }
+
+					it do
+						is_expected.to eq(
+							two: 2,
+							inner: Inner.new({}),
+							inner_with_default: :entity,
+							four: 4
+						)
+					end
 				end
 			end
 
-			context 'without params' do
-				let(:params) { {} }
+			context 'refined options for .field and .nested' do
+				before do
+					stub_const(
+						'FormWithRefinedDefaults', Class.new(Formalism::Form) do
+							class << self
+								%i[field nested].each do |method_name|
+									define_method method_name do |name, type_or_form = nil, **options|
+										options[:default] =
+											options.fetch(:default, -> { :refined_default })
 
-				it do
-					is_expected.to eq(
-						two: 2,
-						inner: Inner.new({}),
-						inner_with_default: :entity,
-						four: 4
+										super(name, type_or_form, **options)
+									end
+								end
+							end
+
+							include ModuleWithDefaults
+
+							field :three
+							field :four, default: 4
+						end
 					)
+				end
+
+				let(:form) { FormWithRefinedDefaults.new(params) }
+
+				context 'with params' do
+					it do
+						is_expected.to eq(
+							one: :first,
+							two: :second,
+							inner: Inner.new(name: 'regular'),
+							inner_with_default: Inner.new(name: :another),
+							three: :third,
+							four: :fourth
+						)
+					end
+				end
+
+				context 'without params' do
+					let(:params) { {} }
+
+					it do
+						is_expected.to eq(
+							one: :refined_default,
+							two: 2,
+							inner: :refined_default,
+							inner_with_default: :entity,
+							three: :refined_default,
+							four: 4
+						)
+					end
 				end
 			end
 		end
