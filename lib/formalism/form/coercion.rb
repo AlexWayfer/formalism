@@ -60,6 +60,10 @@ module Formalism
 		def to_boolean
 			@value ? true : false
 		end
+
+		def to_symbol
+			@value&.to_sym
+		end
 	end
 
 	private_constant :Coercion

@@ -202,5 +202,41 @@ describe Formalism::Form::Fields do
 				end
 			end
 		end
+
+		describe 'redefined accessors' do
+			before do
+				stub_const(
+					'FormWithRedefinedAccessors', Class.new(Formalism::Form) do
+						field :foo, Symbol
+						field :status, Symbol
+
+						## https://github.com/rubocop-hq/rubocop/issues/5956
+						# rubocop:disable Layout/AccessModifierIndentation
+
+						private
+
+						# rubocop:enable Layout/AccessModifierIndentation
+
+						def status=(value)
+							super unless value == 'all'
+						end
+					end
+				)
+			end
+
+			let(:form) { FormWithRedefinedAccessors.new(params) }
+
+			context "with 'all' status (don't call `super`)" do
+				let(:params) { { foo: 'bar', status: 'all' } }
+
+				it { is_expected.to eq foo: :bar }
+			end
+
+			context 'with another status (call `super`)' do
+				let(:params) { { foo: 'bar', status: 'activated' } }
+
+				it { is_expected.to eq foo: :bar, status: :activated }
+			end
+		end
 	end
 end

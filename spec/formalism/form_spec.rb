@@ -87,6 +87,7 @@ describe Formalism::Form do
 				field :count, :integer
 				field :price, Float
 				field :enabled, :boolean
+				field :status, Symbol
 
 				private
 
@@ -101,13 +102,19 @@ describe Formalism::Form do
 		let(:not_coerced_time) { '2018-05-03 14:02:21' }
 
 		let(:not_coerced_params) do
-			{ foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789' }
+			{
+				foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789',
+				status: 'activated'
+			}
 		end
 
 		let(:coerced_time) { Time.new(2018, 5, 3, 14, 2, 21) }
 
 		let(:coerced_params) do
-			{ foo: '1', bar: 2, baz: '3', count: -123, price: 456.789 }
+			{
+				foo: '1', bar: 2, baz: '3', count: -123, price: 456.789,
+				status: :activated
+			}
 		end
 
 		subject { form.fields }
@@ -220,6 +227,7 @@ describe Formalism::Form do
 					field :count, :integer, default: 0
 					field :price, Float, default: 2.5
 					field :enabled, :boolean, default: false
+					field :status, Symbol, default: :all
 				end
 			end
 
@@ -256,7 +264,8 @@ describe Formalism::Form do
 						updated_at: default_created_at,
 						count: 0,
 						price: 2.5,
-						enabled: false
+						enabled: false,
+						status: :all
 					)
 				end
 			end
