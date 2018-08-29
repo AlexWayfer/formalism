@@ -29,14 +29,16 @@ module Formalism
 
 					fields_and_nested_forms[name] = options.merge(type: type)
 
-					define_method(name) { fields[name] }
+					module_for_accessors.instance_exec do
+						define_method(name) { fields[name] }
 
-					private(
+						private
+
 						define_method("#{name}=") do |value|
 							value = Coercion.new(value, type).result
 							fields[name] = value
 						end
-					)
+					end
 				end
 
 				def nested(name, form = nil, **options)
@@ -55,13 +57,25 @@ module Formalism
 				private
 
 				def define_nested_form_methods(name)
-					define_method("#{name}_form") { nested_forms[name] }
+					module_for_accessors.instance_exec do
+						define_method("#{name}_form") { nested_forms[name] }
 
-					define_method(name) do
-						nested_forms[name].public_send(
-							self.class.fields_and_nested_forms[name][:instance_variable]
-						)
+						define_method(name) do
+							nested_forms[name].public_send(
+								self.class.fields_and_nested_forms[name][:instance_variable]
+							)
+						end
 					end
+				end
+
+				def module_for_accessors
+					if const_defined?(:FieldsAccessors, false)
+						mod = const_get(:FieldsAccessors)
+					else
+						mod = const_set(:FieldsAccessors, Module.new)
+						include mod
+					end
+					mod
 				end
 			end
 
