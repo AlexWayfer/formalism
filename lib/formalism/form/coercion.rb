@@ -64,6 +64,10 @@ module Formalism
 		def to_symbol
 			@value&.to_sym
 		end
+
+		def to_array
+			@value&.to_a
+		end
 	end
 
 	private_constant :Coercion

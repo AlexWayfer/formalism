@@ -88,6 +88,7 @@ describe Formalism::Form do
 				field :price, Float
 				field :enabled, :boolean
 				field :status, Symbol
+				field :tags, Array
 
 				private
 
@@ -104,7 +105,7 @@ describe Formalism::Form do
 		let(:not_coerced_params) do
 			{
 				foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789',
-				status: 'activated'
+				status: 'activated', tags: 1..3
 			}
 		end
 
@@ -113,7 +114,7 @@ describe Formalism::Form do
 		let(:coerced_params) do
 			{
 				foo: '1', bar: 2, baz: '3', count: -123, price: 456.789,
-				status: :activated
+				status: :activated, tags: [1, 2, 3]
 			}
 		end
 
@@ -228,6 +229,7 @@ describe Formalism::Form do
 					field :price, Float, default: 2.5
 					field :enabled, :boolean, default: false
 					field :status, Symbol, default: :all
+					field :tags, Array, default: [:world]
 				end
 			end
 
@@ -265,7 +267,8 @@ describe Formalism::Form do
 						count: 0,
 						price: 2.5,
 						enabled: false,
-						status: :all
+						status: :all,
+						tags: [:world]
 					)
 				end
 			end
