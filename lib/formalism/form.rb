@@ -44,14 +44,23 @@ module Formalism
 
 		def fill_fields_and_nested_forms
 			self.class.fields_and_nested_forms.each do |name, options|
-				next fill_nested_form name, options if options.key?(:form)
-				key = options.fetch(:key, name)
-				next unless @params.key?(key) || options.key?(:default)
-				default = options[:default]
-				send "#{name}=", @params.fetch(
-					key, default.is_a?(Proc) ? instance_exec(&default) : default
-				)
+				if options.key?(:form)
+					fill_nested_form name, options
+				else
+					fill_field name, options
+				end
 			end
+		end
+
+		def fill_field(name, options)
+			key = options.fetch(:key, name)
+			if !@params.key?(key) && (!options.key?(:default) || fields.include?(key))
+				return
+			end
+			default = options[:default]
+			send "#{name}=", @params.fetch(
+				key, default.is_a?(Proc) ? instance_exec(&default) : default
+			)
 		end
 
 		def fill_nested_form(name, options)

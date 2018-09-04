@@ -230,8 +230,17 @@ describe Formalism::Form do
 					field :enabled, :boolean, default: false
 					field :status, Symbol, default: :all
 					field :tags, Array, default: [:world]
+
+					def initialize(params, set_count: false)
+						self.count = 2 if set_count
+
+						super params
+					end
 				end
 			end
+
+			let(:form) { form_class.new(params, set_count: set_count) }
+			let(:set_count) { false }
 
 			context 'params is filled' do
 				let(:params) do
@@ -270,6 +279,24 @@ describe Formalism::Form do
 						status: :all,
 						tags: [:world]
 					)
+				end
+			end
+
+			context 'field set in initializer before super' do
+				let(:set_count) { true }
+
+				subject { super()[:count] }
+
+				context 'params is filled' do
+					let(:params) { not_coerced_params }
+
+					it { is_expected.to eq coerced_params[:count] }
+				end
+
+				context 'params is empty' do
+					let(:params) { {} }
+
+					it { is_expected.to eq 2 }
 				end
 			end
 		end
