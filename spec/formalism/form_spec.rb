@@ -198,6 +198,12 @@ describe Formalism::Form do
 
 					it { is_expected.to eq(enabled: false) }
 				end
+
+				context "value is 'false'" do
+					let(:params) { { enabled: 'false' } }
+
+					it { is_expected.to eq(enabled: false) }
+				end
 			end
 
 			it 'raises error if there is no defined coercion to the required type' do

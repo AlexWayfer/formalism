@@ -58,7 +58,7 @@ module Formalism
 		end
 
 		def to_boolean
-			@value ? true : false
+			@value && @value.to_s != 'false' ? true : false
 		end
 
 		def to_symbol
