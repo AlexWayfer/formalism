@@ -20,15 +20,21 @@ module Formalism
 
 		def valid?
 			errors.clear
+
 			nested_forms.each_value(&:valid?)
+
 			validate
+
 			merge_errors_of_nested_forms
+
 			return false if errors.any?
+
 			true
 		end
 
 		def run
 			return Outcome.new(errors) unless valid?
+
 			Outcome.new(errors, super)
 		end
 
@@ -54,9 +60,11 @@ module Formalism
 
 		def fill_field(name, options)
 			key = options.fetch(:key, name)
+
 			if !@params.key?(key) && (!options.key?(:default) || fields.include?(key))
 				return
 			end
+
 			default = options[:default]
 			send "#{name}=", @params.fetch(
 				key, default.is_a?(Proc) ? instance_exec(&default) : default
@@ -65,8 +73,11 @@ module Formalism
 
 		def fill_nested_form(name, options)
 			return unless (form = initialize_nested_form(name, options))
+
 			nested_forms[name] = form
+
 			return if @params.key?(name) || !options.key?(:default)
+
 			default = options[:default]
 			form.instance_variable_set(
 				options[:instance_variable_name],

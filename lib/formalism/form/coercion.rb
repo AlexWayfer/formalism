@@ -17,14 +17,18 @@ module Formalism
 			# rubocop:disable Style/RaiseArgs
 			raise NoCoercionError.new(type) unless defined_for?(type)
 			# rubocop:enable Style/RaiseArgs
+
 			return unless convert_type(type) == Array && options[:of]
+
 			check options[:of]
 		end
 
 		def self.convert_type(type)
 			return type if type.nil? || type.is_a?(Class)
+
 			const_name = type.capitalize
 			return type unless Object.const_defined?(const_name)
+
 			Object.const_get(const_name)
 		end
 
@@ -36,12 +40,15 @@ module Formalism
 
 		def result
 			return @value unless should_be_coreced?
+
 			result = send self.class.method_for @type
+
 			if result.is_a?(Array) && @of
 				result.map! do |element|
 					self.class.new(element, type: @of).result
 				end
 			end
+
 			result
 		end
 
@@ -69,6 +76,7 @@ module Formalism
 
 		def to_time
 			return if @value.nil?
+
 			Time.parse(@value)
 		end
 

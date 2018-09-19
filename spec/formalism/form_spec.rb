@@ -52,7 +52,7 @@ describe Formalism::Form do
 		)
 
 		## https://github.com/bbatsov/rubocop/issues/5830
-		# rubocop:disable Lint/AccessModifierIndentation
+		# rubocop:disable Layout/AccessModifierIndentation
 		stub_const(
 			'AlbumForm', Class.new(described_class) do
 				field :id, Integer, merge: false
@@ -65,6 +65,7 @@ describe Formalism::Form do
 					errors.add('Album title is not present') if title.to_s.empty?
 
 					return if YEAR_RANGE.include? year
+
 					errors.add("Album year is not in #{YEAR_RANGE}")
 				end
 
@@ -73,7 +74,7 @@ describe Formalism::Form do
 				end
 			end
 		)
-		# rubocop:enable Lint/AccessModifierIndentation
+		# rubocop:enable Layout/AccessModifierIndentation
 	end
 
 	describe '.field' do
@@ -508,7 +509,7 @@ describe Formalism::Form do
 			)
 
 			## https://github.com/bbatsov/rubocop/issues/5830
-			# rubocop:disable Lint/AccessModifierIndentation
+			# rubocop:disable Layout/AccessModifierIndentation
 			stub_const(
 				'ArtistForm', Class.new(described_class) do
 					attr_reader :artist
@@ -519,6 +520,7 @@ describe Formalism::Form do
 
 					def validate
 						return unless name.to_s.empty?
+
 						errors.add('Artist name is not present')
 					end
 
@@ -568,6 +570,7 @@ describe Formalism::Form do
 
 					def validate
 						return unless name.to_s.empty?
+
 						errors.add('Compositor name is not present')
 					end
 
@@ -613,7 +616,7 @@ describe Formalism::Form do
 					end
 				end
 			)
-			# rubocop:enable Lint/AccessModifierIndentation
+			# rubocop:enable Layout/AccessModifierIndentation
 		end
 
 		let(:album_with_nested_form) { AlbumWithNestedForm.new(params) }
