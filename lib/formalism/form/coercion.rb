@@ -12,30 +12,45 @@ module Formalism
 			private_method_defined? method_for type
 		end
 
-		def self.check(type)
-			## It's custom error!
+		def self.check(type, options = {})
+			## It's custom error! But cop triggers for single argument anyway.
 			# rubocop:disable Style/RaiseArgs
 			raise NoCoercionError.new(type) unless defined_for?(type)
 			# rubocop:enable Style/RaiseArgs
+			return unless convert_type(type) == Array && options[:of]
+			check options[:of]
 		end
 
-		def initialize(value, type)
-			@value = value
-			@type = convert_type type
-		end
-
-		def result
-			return @value if @type.nil? || (@type.is_a?(Class) && @value.is_a?(@type))
-			send self.class.method_for @type
-		end
-
-		private
-
-		def convert_type(type)
+		def self.convert_type(type)
 			return type if type.nil? || type.is_a?(Class)
 			const_name = type.capitalize
 			return type unless Object.const_defined?(const_name)
 			Object.const_get(const_name)
+		end
+
+		def initialize(value, type:, of: nil)
+			@value = value
+			@type = self.class.convert_type type
+			@of = self.class.convert_type of
+		end
+
+		def result
+			return @value unless should_be_coreced?
+			result = send self.class.method_for @type
+			if result.is_a?(Array) && @of
+				result.map! do |element|
+					self.class.new(element, type: @of).result
+				end
+			end
+			result
+		end
+
+		private
+
+		def should_be_coreced?
+			@type && (
+				!@type.is_a?(Class) || @type == Array || !@value.is_a?(@type)
+			)
 		end
 
 		def to_string

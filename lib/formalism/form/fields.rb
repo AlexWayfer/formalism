@@ -25,20 +25,11 @@ module Formalism
 				end
 
 				def field(name, type = nil, **options)
-					Coercion.check type unless type.nil?
+					Coercion.check type, options unless type.nil?
 
 					fields_and_nested_forms[name] = options.merge(type: type)
 
-					module_for_accessors.instance_exec do
-						define_method(name) { fields[name] }
-
-						private
-
-						define_method("#{name}=") do |value|
-							value = Coercion.new(value, type).result
-							fields[name] = value
-						end
-					end
+					define_field_methods(name)
 				end
 
 				def nested(name, form = nil, **options)
@@ -55,6 +46,20 @@ module Formalism
 				end
 
 				private
+
+				def define_field_methods(name)
+					module_for_accessors.instance_exec do
+						define_method(name) { fields[name] }
+
+						private
+
+						define_method("#{name}=") do |value|
+							options = self.class.fields_and_nested_forms[name]
+							value = Coercion.new(value, **options.slice(:type, :of)).result
+							fields[name] = value
+						end
+					end
+				end
 
 				def define_nested_form_methods(name)
 					module_for_accessors.instance_exec do

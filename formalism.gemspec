@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 	s.homepage      = 'https://github.com/AlexWayfer/formalism'
 	s.license       = 'MIT'
 
-	s.required_ruby_version = '>= 2.3.0'
+	s.required_ruby_version = '>= 2.5.0'
 
 	s.add_dependency 'gorilla_patch', '~> 3'
 

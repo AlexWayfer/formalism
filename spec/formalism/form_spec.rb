@@ -89,6 +89,7 @@ describe Formalism::Form do
 				field :enabled, :boolean
 				field :status, Symbol
 				field :tags, Array
+				field :ids, Array, of: Integer
 
 				private
 
@@ -105,7 +106,7 @@ describe Formalism::Form do
 		let(:not_coerced_params) do
 			{
 				foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789',
-				status: 'activated', tags: 1..3
+				status: 'activated', tags: 1..3, ids: ['04', 5, '6']
 			}
 		end
 
@@ -114,7 +115,7 @@ describe Formalism::Form do
 		let(:coerced_params) do
 			{
 				foo: '1', bar: 2, baz: '3', count: -123, price: 456.789,
-				status: :activated, tags: [1, 2, 3]
+				status: :activated, tags: [1, 2, 3], ids: [4, 5, 6]
 			}
 		end
 
@@ -206,17 +207,36 @@ describe Formalism::Form do
 				end
 			end
 
-			it 'raises error if there is no defined coercion to the required type' do
-				block = lambda do
-					Class.new(described_class) do
-						field :foo
-						field :bar, Class
+			describe 'error if there is no defined coercion to the required type' do
+				shared_examples 'raise error' do
+					it do
+						expect { subject }.to raise_error(
+							Formalism::NoCoercionError, 'Formalism has no coercion to Module'
+						)
 					end
 				end
 
-				expect(&block).to raise_error(
-					Formalism::NoCoercionError, 'Formalism has no coercion to Class'
-				)
+				context 'regular type of field' do
+					subject do
+						Class.new(described_class) do
+							field :foo
+							field :bar, Module
+						end
+					end
+
+					it_behaves_like 'raise error'
+				end
+
+				context 'type of Array' do
+					subject do
+						Class.new(described_class) do
+							field :foo
+							field :bar, Array, of: Module
+						end
+					end
+
+					it_behaves_like 'raise error'
+				end
 			end
 		end
 
@@ -236,6 +256,7 @@ describe Formalism::Form do
 					field :enabled, :boolean, default: false
 					field :status, Symbol, default: :all
 					field :tags, Array, default: [:world]
+					field :ids, Array, of: Integer, default: [7, 8]
 
 					def initialize(params, set_count: false)
 						self.count = 2 if set_count
@@ -283,7 +304,8 @@ describe Formalism::Form do
 						price: 2.5,
 						enabled: false,
 						status: :all,
-						tags: [:world]
+						tags: [:world],
+						ids: [7, 8]
 					)
 				end
 			end
