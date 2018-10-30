@@ -160,6 +160,24 @@ describe 'Formalism::Coercion' do
 		it_behaves_like 'it parses empty string', :''
 	end
 
+	describe '#to_date' do
+		let(:type) { Date }
+
+		it_behaves_like 'it parses nil'
+
+		context 'string with some date' do
+			let(:value) { '1.1.2001' }
+
+			it { is_expected.to eql Date.new(2001, 1, 1) }
+		end
+
+		context 'string with malformed date' do
+			let(:value) { '13.13.13' }
+
+			pending { is_expected.to be_nil }
+		end
+	end
+
 	describe '#to_array' do
 		let(:field_type) { [:array, of: type] }
 

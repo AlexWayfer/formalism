@@ -91,6 +91,12 @@ module Formalism
 		def to_array
 			@value&.to_a
 		end
+
+		def to_date
+			return if @value.nil?
+
+			Date.parse(@value)
+		end
 	end
 
 	private_constant :Coercion

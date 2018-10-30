@@ -85,6 +85,7 @@ describe Formalism::Form do
 				field :bar, Integer
 				field :baz, String
 				field :created_at, Time
+				field :release_date, Date
 				field :count, :integer
 				field :price, Float
 				field :enabled, :boolean
@@ -107,7 +108,8 @@ describe Formalism::Form do
 		let(:not_coerced_params) do
 			{
 				foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789',
-				status: 'activated', tags: 1..3, ids: ['04', 5, '6']
+				status: 'activated', tags: 1..3, ids: ['04', 5, '6'],
+				release_date: '1.1.2001'
 			}
 		end
 
@@ -116,7 +118,8 @@ describe Formalism::Form do
 		let(:coerced_params) do
 			{
 				foo: '1', bar: 2, baz: '3', count: -123, price: 456.789,
-				status: :activated, tags: [1, 2, 3], ids: [4, 5, 6]
+				status: :activated, tags: [1, 2, 3], ids: [4, 5, 6],
+				release_date: Date.new(2001, 1, 1)
 			}
 		end
 
@@ -256,6 +259,7 @@ describe Formalism::Form do
 					field :price, Float, default: 2.5
 					field :enabled, :boolean, default: false
 					field :status, Symbol, default: :all
+					field :release_date, Date, default: -> { Date.new(2002, 1, 1) }
 					field :tags, Array, default: [:world]
 					field :ids, Array, of: Integer, default: [7, 8]
 
@@ -306,7 +310,8 @@ describe Formalism::Form do
 						enabled: false,
 						status: :all,
 						tags: [:world],
-						ids: [7, 8]
+						ids: [7, 8],
+						release_date: Date.new(2002, 1, 1)
 					)
 				end
 			end
