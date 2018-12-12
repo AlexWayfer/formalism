@@ -119,16 +119,24 @@ describe 'Formalism::Coercion' do
 		end
 
 		context 'string with malformed time' do
-			let(:value) { '25:00' }
+			context 'hours' do
+				let(:value) { '25:00' }
 
-			pending { is_expected.to be_nil }
+				it { is_expected.to be_nil }
+			end
+
+			context 'minutes' do
+				let(:value) { '23:69' }
+
+				it { is_expected.to be_nil }
+			end
 		end
 
 		context 'number in seconds' do
 			let(:value) { expectation.to_i }
 			let(:expectation) { Time.new(2001, 1, 1, 11, 0) }
 
-			pending { is_expected.to eq expectation }
+			it { is_expected.to eq expectation }
 		end
 	end
 
@@ -174,7 +182,7 @@ describe 'Formalism::Coercion' do
 		context 'string with malformed date' do
 			let(:value) { '13.13.13' }
 
-			pending { is_expected.to be_nil }
+			it { is_expected.to be_nil }
 		end
 	end
 
