@@ -2,6 +2,7 @@
 
 require_relative 'form/fields'
 require_relative 'form/outcome'
+require_relative 'form/validation_error'
 
 module Formalism
 	## Class for forms

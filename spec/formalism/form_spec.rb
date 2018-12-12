@@ -640,7 +640,7 @@ describe Formalism::Form do
 		end
 
 		describe '#result' do
-			subject { form_run.result }
+			subject(:result) { form_run.result }
 
 			context 'with correct params' do
 				let(:params) { correct_album_params }
@@ -653,10 +653,18 @@ describe Formalism::Form do
 
 			context 'with incorrect params' do
 				let(:params) { incorrect_album_params }
-
-				it { is_expected.to be_nil }
+				let(:error_message) do
+					<<~MESSAGE.chomp
+						Outcome has errors: ["Album title is not present", "Album year is not in #{YEAR_RANGE}"]
+					MESSAGE
+				end
 
 				include_examples 'there are no Albums'
+
+				it do
+					expect { result }
+						.to raise_error Formalism::Form::ValidationError, error_message
+				end
 			end
 		end
 	end
