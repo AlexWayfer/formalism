@@ -5,7 +5,7 @@ module Formalism
 	class Form < Action
 		## Private class for results
 		class Outcome
-			attr_reader :errors, :result
+			attr_reader :errors
 
 			def initialize(errors, result = nil)
 				@errors = errors
@@ -14,6 +14,12 @@ module Formalism
 
 			def success?
 				@errors.empty?
+			end
+
+			def result
+				raise ValidationError, errors if errors.any?
+
+				@result
 			end
 		end
 
