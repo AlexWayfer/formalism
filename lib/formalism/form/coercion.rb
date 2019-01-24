@@ -97,6 +97,10 @@ module Formalism
 			@value&.to_a
 		end
 
+		def to_hash
+			@value&.to_h
+		end
+
 		def to_date
 			return if @value.nil?
 

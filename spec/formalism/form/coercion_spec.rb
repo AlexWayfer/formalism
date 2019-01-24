@@ -209,4 +209,17 @@ describe 'Formalism::Coercion' do
 			end
 		end
 	end
+
+	describe '#to_hash' do
+		let(:type) { Hash }
+
+		it_behaves_like 'it parses empty array', {}
+		it_behaves_like 'it parses empty hash', {}
+
+		context 'Hash of Symbol -> String' do
+			let(:value) { { foo: 'bar', baz: 'qux' } }
+
+			it { is_expected.to eql(foo: 'bar', baz: 'qux') }
+		end
+	end
 end
