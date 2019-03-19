@@ -114,7 +114,7 @@ module Formalism
 					merge_option =
 						self.class.fields_and_nested_forms[name].fetch(:merge, true)
 
-					next merge_option unless type == :nested_form
+					next merge_option unless type == :nested_forms
 
 					merge_option && value.instance_variable_defined?(
 						self.class.fields_and_nested_forms[name][:instance_variable_name]
