@@ -210,12 +210,7 @@ describe Formalism::Form::Fields do
 						field :foo, Symbol
 						field :status, Symbol
 
-						## https://github.com/rubocop-hq/rubocop/issues/5956
-						# rubocop:disable Layout/AccessModifierIndentation
-
 						private
-
-						# rubocop:enable Layout/AccessModifierIndentation
 
 						def status=(value)
 							super unless value == 'all'

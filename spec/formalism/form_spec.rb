@@ -51,8 +51,6 @@ describe Formalism::Form do
 			'Album', Model.new(:title, :year, :artist, :tag, :label, :genre)
 		)
 
-		## https://github.com/bbatsov/rubocop/issues/5830
-		# rubocop:disable Layout/AccessModifierIndentation
 		stub_const(
 			'AlbumForm', Class.new(described_class) do
 				field :id, Integer, merge: false
@@ -74,7 +72,6 @@ describe Formalism::Form do
 				end
 			end
 		)
-		# rubocop:enable Layout/AccessModifierIndentation
 	end
 
 	describe '.field' do
@@ -532,8 +529,6 @@ describe Formalism::Form do
 				'Label', Model.new(:name)
 			)
 
-			## https://github.com/bbatsov/rubocop/issues/5830
-			# rubocop:disable Layout/AccessModifierIndentation
 			stub_const(
 				'ArtistForm', Class.new(described_class) do
 					attr_reader :artist
@@ -640,7 +635,6 @@ describe Formalism::Form do
 					end
 				end
 			)
-			# rubocop:enable Layout/AccessModifierIndentation
 		end
 
 		let(:album_with_nested_form) { AlbumWithNestedForm.new(params) }
