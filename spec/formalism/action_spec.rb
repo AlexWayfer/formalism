@@ -40,7 +40,7 @@ describe Formalism::Action do
 
 			it do
 				expect { subject }.to raise_error(
-					NoMethodError, "undefined method `upcase' for 42:Integer"
+					NoMethodError, /undefined method `upcase' for 42:Integer/
 				)
 			end
 		end
