@@ -66,9 +66,10 @@ module Formalism
 			end
 
 			default = options[:default]
-			send "#{name}=", @params.fetch(
-				key, default.is_a?(Proc) ? instance_exec(&default) : default
-			)
+			send "#{name}=",
+				if @params.key?(key) then @params[key]
+				else default.is_a?(Proc) ? instance_exec(&default) : default
+				end
 		end
 
 		def fill_nested_form(name, options)

@@ -253,7 +253,12 @@ describe Formalism::Form do
 					field :bar, Integer, default: nil
 					field :baz, String, default: 'qwerty'
 					field :name, String, default: nil
-					field :created_at, Time, default: -> { default_created_at }
+					field :created_at, Time, default: (
+						lambda do
+							@default_called = true
+							default_created_at
+						end
+					)
 					field :updated_at, Time, default: -> { created_at }
 					field :count, :integer, default: 0
 					field :price, Float, default: 2.5
@@ -262,6 +267,8 @@ describe Formalism::Form do
 					field :release_date, Date, default: -> { Date.new(2002, 1, 1) }
 					field :tags, Array, default: [:world]
 					field :ids, Array, of: Integer, default: [7, 8]
+
+					attr_reader :default_called
 
 					def initialize(params, set_count: false)
 						self.count = 2 if set_count
@@ -293,6 +300,12 @@ describe Formalism::Form do
 						enabled: true
 					)
 				end
+
+				describe '@default_called' do
+					subject { form.default_called }
+
+					it { is_expected.to be_nil }
+				end
 			end
 
 			context 'params is empty' do
@@ -313,6 +326,12 @@ describe Formalism::Form do
 						ids: [7, 8],
 						release_date: Date.new(2002, 1, 1)
 					)
+				end
+
+				describe '@default_called' do
+					subject { form.default_called }
+
+					it { is_expected.to be true }
 				end
 			end
 
