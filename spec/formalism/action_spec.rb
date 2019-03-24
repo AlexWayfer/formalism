@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 describe Formalism::Action do
+	subject(:test_action) { test_action_class.new(params) }
+
 	let(:test_action_class) do
 		Class.new(described_class) do
 			private
@@ -11,8 +13,6 @@ describe Formalism::Action do
 		end
 	end
 
-	subject(:test_action) { test_action_class.new(params) }
-
 	describe '#params' do
 		subject { test_action.params }
 
@@ -21,7 +21,7 @@ describe Formalism::Action do
 		it { is_expected.to eq params }
 		it { is_expected.not_to be params }
 
-		context 'params does not received' do
+		context 'without received params' do
 			let(:params) { nil }
 
 			it { is_expected.to eq({}) }
