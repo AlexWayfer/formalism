@@ -18,3 +18,8 @@ Metrics/BlockLength:
 
 AllCops:
   TargetRubyVersion: 2.5
+
+require: rubocop-rspec
+
+RSpec/NestedGroups:
+  Enabled: false

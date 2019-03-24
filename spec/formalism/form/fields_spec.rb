@@ -1,45 +1,35 @@
 # frozen_string_literal: true
 
 describe Formalism::Form::Fields do
-	before do
-		stub_const('Inner', Struct.new(:name))
+	Inner = Struct.new(:name)
 
-		stub_const(
-			'InnerForm', Class.new(Formalism::Form) do
-				field :name, String
+	class InnerForm < Formalism::Form
+		field :name, String
 
-				attr_reader :inner
+		attr_reader :inner
 
-				def initialize(*)
-					super
-					@inner = Inner.new(fields_and_nested_forms)
-				end
-			end
-		)
+		def initialize(*)
+			super
+			@inner = Inner.new(fields_and_nested_forms)
+		end
+	end
 
-		stub_const(
-			'BaseModule', Module.new do
-				include Formalism::Form::Fields
+	module BaseModule
+		include Formalism::Form::Fields
 
-				field :foo
+		field :foo
 
-				nested :inner, InnerForm
-			end
-		)
+		nested :inner, InnerForm
+	end
 
-		stub_const(
-			'AnotherBaseModule', Module.new do
-				include BaseModule
+	module AnotherBaseModule
+		include BaseModule
 
-				field :bar, Integer
-			end
-		)
+		field :bar, Integer
+	end
 
-		stub_const(
-			'MainForm', Class.new(Formalism::Form) do
-				include AnotherBaseModule
-			end
-		)
+	class MainForm < Formalism::Form
+		include AnotherBaseModule
 	end
 
 	let(:main_form) do
@@ -49,16 +39,18 @@ describe Formalism::Form::Fields do
 	describe '.fields_and_nested_forms' do
 		subject { MainForm.fields_and_nested_forms }
 
-		it do
-			is_expected.to eq(
+		let(:result_hash) do
+			{
 				foo: { type: nil }, bar: { type: Integer },
 				inner: {
 					form: InnerForm,
 					instance_variable: :inner,
 					instance_variable_name: '@inner'
 				}
-			)
+			}
 		end
+
+		it { is_expected.to eq result_hash }
 	end
 
 	describe '#fields' do
@@ -71,40 +63,32 @@ describe Formalism::Form::Fields do
 		subject { form.send :fields_and_nested_forms }
 
 		describe 'defaults' do
-			before do
-				stub_const(
-					'InnerWithDefaultForm', Class.new(Formalism::Form) do
-						field :name
+			class InnerWithDefaultForm < Formalism::Form
+				field :name
 
-						attr_reader :inner_with_default
+				attr_reader :inner_with_default
 
-						def initialize(*)
-							super
-							@inner_with_default = Inner.new(fields_and_nested_forms)
-						end
-					end
-				)
+				def initialize(*)
+					super
+					@inner_with_default = Inner.new(fields_and_nested_forms)
+				end
+			end
 
-				stub_const(
-					'ModuleWithDefaults', Module.new do
-						include Formalism::Form::Fields
+			module ModuleWithDefaults
+				include Formalism::Form::Fields
 
-						field :one
-						field :two, default: 2
+				field :one
+				field :two, default: 2
 
-						nested :inner, InnerForm
-						nested :inner_with_default, InnerWithDefaultForm, default: :entity
-					end
-				)
+				nested :inner, InnerForm
+				nested :inner_with_default, InnerWithDefaultForm, default: :entity
+			end
 
-				stub_const(
-					'FormWithDefaults', Class.new(Formalism::Form) do
-						include ModuleWithDefaults
+			class FormWithDefaults < Formalism::Form
+				include ModuleWithDefaults
 
-						field :three
-						field :four, default: 4
-					end
-				)
+				field :three
+				field :four, default: 4
 			end
 
 			let(:params) do
@@ -118,87 +102,80 @@ describe Formalism::Form::Fields do
 				}
 			end
 
-			context 'regular' do
+			let(:result_with_params) do
+				{
+					one: :first,
+					two: :second,
+					inner: Inner.new(name: 'regular'),
+					inner_with_default: Inner.new(name: :another),
+					three: :third,
+					four: :fourth
+				}
+			end
+
+			let(:result_without_params) do
+				{
+					two: 2,
+					inner: Inner.new({}),
+					inner_with_default: :entity,
+					four: 4
+				}
+			end
+
+			context 'when regular' do
 				let(:form) { FormWithDefaults.new(params) }
 
 				context 'with params' do
-					it do
-						is_expected.to eq(
-							one: :first,
-							two: :second,
-							inner: Inner.new(name: 'regular'),
-							inner_with_default: Inner.new(name: :another),
-							three: :third,
-							four: :fourth
-						)
-					end
+					it { is_expected.to eq result_with_params }
 				end
 
 				context 'without params' do
 					let(:params) { {} }
 
-					it do
-						is_expected.to eq(
-							two: 2,
-							inner: Inner.new({}),
-							inner_with_default: :entity,
-							four: 4
-						)
-					end
+					it { is_expected.to eq result_without_params }
 				end
 			end
 
-			context 'refined options for .field and .nested' do
-				before do
-					stub_const(
-						'FormWithRefinedDefaults', Class.new(Formalism::Form) do
-							class << self
-								%i[field nested].each do |method_name|
-									define_method method_name do |name, type_or_form = nil, **options|
-										options[:default] =
-											options.fetch(:default, -> { :refined_default })
+			context 'with refined options for .field and .nested' do
+				class FormWithRefinedDefaults < Formalism::Form
+					class << self
+						%i[field nested].each do |method_name|
+							define_method method_name do |name, type_or_form = nil, **options|
+								options[:default] =
+									options.fetch(:default, -> { :refined_default })
 
-										super(name, type_or_form, **options)
-									end
-								end
+								super(name, type_or_form, **options)
 							end
-
-							include ModuleWithDefaults
-
-							field :three
-							field :four, default: 4
 						end
-					)
+					end
+
+					include ModuleWithDefaults
+
+					field :three
+					field :four, default: 4
 				end
 
 				let(:form) { FormWithRefinedDefaults.new(params) }
 
 				context 'with params' do
-					it do
-						is_expected.to eq(
-							one: :first,
-							two: :second,
-							inner: Inner.new(name: 'regular'),
-							inner_with_default: Inner.new(name: :another),
-							three: :third,
-							four: :fourth
-						)
-					end
+					it { is_expected.to eq result_with_params }
 				end
 
 				context 'without params' do
 					let(:params) { {} }
 
-					it do
-						is_expected.to eq(
+					let(:result_without_params) do
+						{
 							one: :refined_default,
 							two: 2,
 							inner: :refined_default,
 							inner_with_default: :entity,
 							three: :refined_default,
 							four: 4
-						)
+						}
 					end
+
+					it { is_expected.to eq result_without_params }
 				end
 			end
 		end
