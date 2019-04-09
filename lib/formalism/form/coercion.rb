@@ -82,8 +82,8 @@ module Formalism
 				when Integer
 					Time.at @value
 				end
-			rescue ArgumentError => exception
-				raise unless exception.message.include? 'out of range'
+			rescue ArgumentError => e
+				raise unless e.message.include? 'out of range'
 			end
 
 			def to_boolean
@@ -106,8 +106,8 @@ module Formalism
 				return if @value.nil?
 
 				Date.parse(@value)
-			rescue ArgumentError => exception
-				raise unless exception.message == 'invalid date'
+			rescue ArgumentError => e
+				raise unless e.message == 'invalid date'
 			end
 		end
 
