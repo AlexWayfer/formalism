@@ -81,7 +81,7 @@ module Formalism
 
 			default = options[:default]
 			form.instance_variable_set(
-				options[:instance_variable_name],
+				"@#{options[:instance_variable]}",
 				default.is_a?(Proc) ? instance_exec(&default) : default
 			)
 		end
