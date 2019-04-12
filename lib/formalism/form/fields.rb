@@ -39,7 +39,6 @@ module Formalism
 					end
 
 					options[:instance_variable] ||= name
-					options[:instance_variable_name] = "@#{options[:instance_variable]}"
 					fields_and_nested_forms[name] = options.merge(form: form)
 
 					define_nested_form_methods(name)
@@ -110,15 +109,8 @@ module Formalism
 			end
 
 			def select_for_merging(type)
-				send(type).select do |name, value|
-					merge_option =
-						self.class.fields_and_nested_forms[name].fetch(:merge, true)
-
-					next merge_option unless type == :nested_forms
-
-					merge_option && value.instance_variable_defined?(
-						self.class.fields_and_nested_forms[name][:instance_variable_name]
-					)
+				send(type).select do |name, _value|
+					self.class.fields_and_nested_forms[name].fetch(:merge, true)
 				end
 			end
 		end

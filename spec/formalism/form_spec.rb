@@ -43,7 +43,7 @@ describe Formalism::Form do
 		end
 	end
 
-	Album = Model.new(:title, :year, :artist, :tag, :label, :genre)
+	Album = Model.new(:title, :year, :artist, :tag, :label, :genre, :producer)
 
 	class AlbumForm < described_class
 		field :id, Integer, merge: false
@@ -592,6 +592,24 @@ describe Formalism::Form do
 			end
 		end
 
+		class ProducerForm < described_class
+			extend Forwardable
+
+			def_delegator :artist_form, :artist, :producer
+
+			field :name
+
+			nested :artist, ArtistForm,
+				initialize: ->(form) { form.new(fields_and_nested_forms) },
+				errors_key: nil
+
+			private
+
+			def execute
+				artist_form.run
+			end
+		end
+
 		class AlbumWithNestedForm < AlbumForm
 			nested :artist, ArtistForm
 
@@ -613,12 +631,15 @@ describe Formalism::Form do
 
 			nested :hashtag, TagForm, instance_variable: :tag, merge: false
 
+			nested :producer, ProducerForm, instance_variable: :artist
+
 			private
 
 			def execute
 				artist_form.run
 				tag_form.run
 				label_form.run
+				producer_form.run
 				super
 			end
 
@@ -642,7 +663,11 @@ describe Formalism::Form do
 			subject { album_with_nested_form.valid? }
 
 			context 'with correct params' do
-				let(:params) { correct_album_params.merge(artist: { name: 'Bar' }) }
+				let(:params) do
+					correct_album_params.merge(
+						artist: { name: 'Bar' }, producer: { name: 'Producer' }
+					)
+				end
 
 				it { is_expected.to be true }
 			end
@@ -656,6 +681,13 @@ describe Formalism::Form do
 
 		describe '#run' do
 			subject(:form_run) { album_with_nested_form.run }
+
+			let(:correct_album_with_nested_forms_params) do
+				correct_album_params.merge(
+					artist: { name: 'Bar' }, tag: { name: 'Blues' },
+					label_name: 'RAM', producer: { name: 'Producer' }
+				)
+			end
 
 			shared_examples 'global data is empty' do
 				before do
@@ -690,19 +722,23 @@ describe Formalism::Form do
 
 				let(:album) do
 					Album.new(
-						correct_album_params.merge(artist: artist, tag: tag, label: label)
+						correct_album_params.merge(
+							artist: artist, tag: tag, label: label, producer: producer
+						)
 					)
 				end
+
 				let(:artist) { Artist.new(name: 'Bar') }
 				let(:tag) { Tag.new(name: 'Blues') }
 				let(:label) { Label.new(name: 'RAM') }
+				let(:producer) { Artist.new(name: 'Producer') }
 
 				include_examples 'there is one Album'
 
 				describe 'all Artists' do
 					subject { Artist.all }
 
-					it { is_expected.to eq [artist] }
+					it { is_expected.to eq [artist, producer] }
 				end
 
 				describe 'all Labels' do
@@ -722,11 +758,7 @@ describe Formalism::Form do
 				subject { super().success? }
 
 				context 'with correct params' do
-					let(:params) do
-						correct_album_params.merge(
-							artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
-						)
-					end
+					let(:params) { correct_album_with_nested_forms_params }
 
 					it { is_expected.to be true }
 
@@ -746,11 +778,7 @@ describe Formalism::Form do
 				subject { super().errors }
 
 				context 'with correct params' do
-					let(:params) do
-						correct_album_params.merge(
-							artist: { name: 'Bar' }, tag: { name: 'Blues' }, label_name: 'RAM'
-						)
-					end
+					let(:params) { correct_album_with_nested_forms_params }
 
 					it { is_expected.to be_empty }
 

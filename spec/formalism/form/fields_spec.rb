@@ -44,8 +44,7 @@ describe Formalism::Form::Fields do
 				foo: { type: nil }, bar: { type: Integer },
 				inner: {
 					form: InnerForm,
-					instance_variable: :inner,
-					instance_variable_name: '@inner'
+					instance_variable: :inner
 				}
 			}
 		end
