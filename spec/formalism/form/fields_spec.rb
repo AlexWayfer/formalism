@@ -6,12 +6,16 @@ describe Formalism::Form::Fields do
 	class InnerForm < Formalism::Form
 		field :name, String
 
-		attr_reader :inner
-
-		def initialize(*)
+		## https://github.com/rubocop-hq/rubocop-rspec/issues/750
+		# rubocop:disable RSpec/InstanceVariable
+		def initialize(*args)
 			super
-			@inner = Inner.new(fields_and_nested_forms)
+
+			return if defined?(@instance)
+
+			@instance = Inner.new(fields_and_nested_forms)
 		end
+		# rubocop:enable RSpec/InstanceVariable
 	end
 
 	module BaseModule
@@ -43,8 +47,7 @@ describe Formalism::Form::Fields do
 			{
 				foo: { type: nil }, bar: { type: Integer },
 				inner: {
-					form: InnerForm,
-					instance_variable: :inner
+					form: InnerForm
 				}
 			}
 		end
@@ -65,12 +68,16 @@ describe Formalism::Form::Fields do
 			class InnerWithDefaultForm < Formalism::Form
 				field :name
 
-				attr_reader :inner_with_default
-
-				def initialize(*)
+				## https://github.com/rubocop-hq/rubocop-rspec/issues/750
+				# rubocop:disable RSpec/InstanceVariable
+				def initialize(*args)
 					super
-					@inner_with_default = Inner.new(fields_and_nested_forms)
+
+					return if defined?(@instance)
+
+					@instance = Inner.new(fields_and_nested_forms)
 				end
+				# rubocop:enable RSpec/InstanceVariable
 			end
 
 			module ModuleWithDefaults
