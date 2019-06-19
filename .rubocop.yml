@@ -2,12 +2,32 @@ Layout/Tab:
   Enabled: false
 Layout/IndentationWidth:
   Width: 1
-Layout/IndentArray:
-  EnforcedStyle: consistent
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented_relative_to_receiver
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+Layout/AlignArguments:
+  EnforcedStyle: with_fixed_indentation
 Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
-Layout/FirstParameterIndentation:
+Layout/IndentFirstArgument:
   EnforcedStyle: consistent
+Layout/IndentFirstArrayElement:
+  EnforcedStyle: consistent
+Layout/IndentFirstHashElement:
+  EnforcedStyle: consistent
+Layout/MultilineArrayBraceLayout:
+  EnforcedStyle: new_line
+Layout/MultilineHashBraceLayout:
+  EnforcedStyle: new_line
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+Layout/MultilineHashKeyLineBreaks:
+  Enabled: true
 Naming/UncommunicativeMethodParamName:
   AllowedNames:
     - of

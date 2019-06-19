@@ -41,7 +41,8 @@ describe Formalism::Form::Fields do
 
 		let(:result_hash) do
 			{
-				foo: { type: nil }, bar: { type: Integer },
+				foo: { type: nil },
+				bar: { type: Integer },
 				inner: {
 					form: InnerForm,
 					instance_variable: :inner

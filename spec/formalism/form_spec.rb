@@ -134,8 +134,14 @@ describe Formalism::Form do
 
 		let(:not_coerced_params) do
 			{
-				foo: '1', bar: '2', baz: 3, count: '-0123', price: '+00456.789',
-				status: 'activated', tags: 1..3, ids: ['04', 5, '6'],
+				foo: '1',
+				bar: '2',
+				baz: 3,
+				count: '-0123',
+				price: '+00456.789',
+				status: 'activated',
+				tags: 1..3,
+				ids: ['04', 5, '6'],
 				release_date: '1.1.2001'
 			}
 		end
@@ -144,8 +150,14 @@ describe Formalism::Form do
 
 		let(:coerced_params) do
 			{
-				foo: '1', bar: 2, baz: '3', count: -123, price: 456.789,
-				status: :activated, tags: [1, 2, 3], ids: [4, 5, 6],
+				foo: '1',
+				bar: 2,
+				baz: '3',
+				count: -123,
+				price: 456.789,
+				status: :activated,
+				tags: [1, 2, 3],
+				ids: [4, 5, 6],
 				release_date: Date.new(2001, 1, 1)
 			}
 		end
