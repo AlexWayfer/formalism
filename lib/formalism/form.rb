@@ -8,12 +8,20 @@ module Formalism
 	class Form < Action
 		include Form::Fields
 
+		attr_reader :instance
+
 		def self.inherited(child)
 			child.fields_and_nested_forms.merge!(fields_and_nested_forms)
 		end
 
-		def initialize(params = {})
-			super
+		def initialize(params_or_instance = {})
+			if params_or_instance.is_a?(Hash)
+				super
+			else
+				super({})
+
+				@instance = params_or_instance
+			end
 
 			fill_fields_and_nested_forms
 		end
@@ -60,36 +68,38 @@ module Formalism
 
 		def fill_field(name, options)
 			key = options.fetch(:key, name)
+			setter = "#{name}="
 
-			if !@params.key?(key) && (!options.key?(:default) || fields.include?(key))
-				return
+			if @params.key?(key)
+				send setter, @params[key]
+			elsif @instance.respond_to?(key)
+				send setter, @instance.public_send(key)
+			elsif options.key?(:default) && !fields.include?(key)
+				send setter, process_default(options[:default])
 			end
-
-			default = options[:default]
-			send "#{name}=",
-				if @params.key?(key) then @params[key]
-				else default.is_a?(Proc) ? instance_exec(&default) : default
-				end
 		end
 
 		def fill_nested_form(name, options)
 			return unless (form = initialize_nested_form(name, options))
 
 			nested_forms[name] = form
+		end
 
-			return if @params.key?(name) || !options.key?(:default)
-
-			default = options[:default]
-			form.instance_variable_set(
-				"@#{options[:instance_variable]}",
-				default.is_a?(Proc) ? instance_exec(&default) : default
-			)
+		def process_default(default)
+			default.is_a?(Proc) ? instance_exec(&default) : default
 		end
 
 		def initialize_nested_form(name, options)
+			args =
+				if @params.key?(name) then [@params[name]]
+				elsif @instance.respond_to?(name) then [@instance.public_send(name)]
+				elsif options.key?(:default) then [process_default(options[:default])]
+				else []
+				end
+
 			instance_exec(
 				options[:form],
-				&options.fetch(:initialize, ->(form) { form.new(params[name]) })
+				&options.fetch(:initialize, ->(form) { form.new(*args) })
 			)
 		end
 

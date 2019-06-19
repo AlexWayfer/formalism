@@ -38,7 +38,6 @@ module Formalism
 							'is not present'
 					end
 
-					options[:instance_variable] ||= name
 					fields_and_nested_forms[name] = options.merge(form: form)
 
 					define_nested_form_methods(name)
@@ -64,11 +63,7 @@ module Formalism
 					module_for_accessors.instance_exec do
 						define_method("#{name}_form") { nested_forms[name] }
 
-						define_method(name) do
-							nested_forms[name].public_send(
-								self.class.fields_and_nested_forms[name][:instance_variable]
-							)
-						end
+						define_method(name) { nested_forms[name].instance }
 					end
 				end
 

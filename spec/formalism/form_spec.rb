@@ -61,7 +61,7 @@ describe Formalism::Form do
 		end
 
 		def execute
-			@album = Album.create(fields_and_nested_forms)
+			@instance = Album.create(fields_and_nested_forms)
 		end
 	end
 
@@ -123,7 +123,7 @@ describe Formalism::Form do
 				private
 
 				def execute
-					@entity = Model.new(:foo, :bar).create(fields_and_nested_forms)
+					@instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
 				end
 			end
 		end
@@ -420,6 +420,24 @@ describe Formalism::Form do
 
 			it { expect { form.run }.not_to raise_error }
 		end
+
+		describe 'values from params is more important than from @instance' do
+			let(:form_class) do
+				Class.new(described_class) do
+					field :foo
+
+					def initialize(params)
+						@instance = Struct.new(:foo).new(:from_instance)
+
+						super
+					end
+				end
+			end
+
+			let(:params) { { foo: :from_params } }
+
+			it { is_expected.to eq(foo: :from_params) }
+		end
 	end
 
 	describe '#fields' do
@@ -528,8 +546,6 @@ describe Formalism::Form do
 		Label = Model.new(:name)
 
 		class ArtistForm < described_class
-			attr_reader :artist
-
 			field :name
 
 			private
@@ -541,25 +557,27 @@ describe Formalism::Form do
 			end
 
 			def execute
-				@artist = Artist.find_or_create(fields_and_nested_forms)
+				@instance = Artist.find_or_create(fields_and_nested_forms)
 			end
 		end
 
 		class TagForm < described_class
 			field :name, String
 
-			attr_reader :tag
-
 			private
 
+			def validate
+				return unless name.to_s.empty?
+
+				errors.add('Tag name is not present')
+			end
+
 			def execute
-				@tag = Tag.find_or_create(fields_and_nested_forms)
+				@instance = Tag.find_or_create(fields_and_nested_forms)
 			end
 		end
 
 		class LabelForm < described_class
-			attr_reader :label
-
 			def initialize(name)
 				@name = name
 			end
@@ -569,14 +587,12 @@ describe Formalism::Form do
 			def execute
 				## https://github.com/rubocop-hq/rubocop-rspec/issues/750
 				# rubocop:disable RSpec/InstanceVariable
-				@label = Label.find_or_create(name: @name)
+				@instance = Label.find_or_create(name: @name)
 				# rubocop:enable RSpec/InstanceVariable
 			end
 		end
 
 		class CompositorForm < described_class
-			attr_reader :compositor
-
 			field :name
 
 			private
@@ -588,14 +604,14 @@ describe Formalism::Form do
 			end
 
 			def execute
-				@compositor = Compositor.find_or_create(fields_and_nested_forms)
+				@instance = Compositor.find_or_create(fields_and_nested_forms)
 			end
 		end
 
 		class ProducerForm < described_class
 			extend Forwardable
 
-			def_delegator :artist_form, :artist, :producer
+			def_delegator :artist_form, :instance
 
 			field :name
 
@@ -629,9 +645,9 @@ describe Formalism::Form do
 
 			nested :update_something, initialize: ->(_form) { nil }
 
-			nested :hashtag, TagForm, instance_variable: :tag, merge: false
+			nested :hashtag, TagForm, merge: false
 
-			nested :producer, ProducerForm, instance_variable: :artist
+			nested :producer, ProducerForm
 
 			private
 
@@ -665,7 +681,8 @@ describe Formalism::Form do
 			context 'with correct params' do
 				let(:params) do
 					correct_album_params.merge(
-						artist: { name: 'Bar' }, producer: { name: 'Producer' }
+						artist: { name: 'Bar' }, producer: { name: 'Producer' },
+						hashtag: { name: '#cool' }
 					)
 				end
 
@@ -685,7 +702,8 @@ describe Formalism::Form do
 			let(:correct_album_with_nested_forms_params) do
 				correct_album_params.merge(
 					artist: { name: 'Bar' }, tag: { name: 'Blues' },
-					label_name: 'RAM', producer: { name: 'Producer' }
+					label_name: 'RAM', producer: { name: 'Producer' },
+					hashtag: { name: '#cool' }
 				)
 			end
 
@@ -708,10 +726,10 @@ describe Formalism::Form do
 					it { is_expected.to be_empty }
 				end
 
-				describe 'tag of `album_with_nested_form`' do
-					subject { album_with_nested_form.tag }
+				describe 'all Tags' do
+					subject { Tag.all }
 
-					it { is_expected.to eq Tag.new(name: 'default') }
+					it { is_expected.to be_empty }
 				end
 			end
 
@@ -790,7 +808,7 @@ describe Formalism::Form do
 					let(:result_errors) do
 						[
 							'Album title is not present', 'Artist name is not present',
-							'Compositor name is not present'
+							'Compositor name is not present', 'Tag name is not present'
 						].to_set
 					end
 
@@ -798,6 +816,32 @@ describe Formalism::Form do
 
 					include_examples 'global data is empty'
 				end
+			end
+
+			describe 'values from params is more important than from @instance' do
+				subject { form_class.new(params).send :fields_and_nested_forms }
+
+				let(:inner_form_class) do
+					Class.new(described_class)
+				end
+
+				let(:form_class) do
+					inner_form_class = self.inner_form_class
+
+					Class.new(described_class) do
+						nested :inner_form, inner_form_class
+
+						def initialize(params)
+							@instance = Struct.new(:inner_form).new(:from_instance)
+
+							super
+						end
+					end
+				end
+
+				let(:params) { { inner_form: :from_params } }
+
+				it { is_expected.to eq(inner_form: :from_params) }
 			end
 		end
 	end
