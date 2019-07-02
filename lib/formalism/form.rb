@@ -72,8 +72,8 @@ module Formalism
 
 			if @params.key?(key)
 				send setter, @params[key]
-			elsif @instance.respond_to?(key)
-				send setter, @instance.public_send(key)
+			elsif instance_respond_to?(key)
+				send setter, instance_public_send(key)
 			elsif options.key?(:default) && !fields.include?(key)
 				send setter, process_default(options[:default])
 			end
@@ -92,7 +92,7 @@ module Formalism
 		def initialize_nested_form(name, options)
 			args =
 				if @params.key?(name) then [@params[name]]
-				elsif @instance.respond_to?(name) then [@instance.public_send(name)]
+				elsif instance_respond_to?(name) then [instance_public_send(name)]
 				elsif options.key?(:default) then [process_default(options[:default])]
 				else []
 				end
@@ -101,6 +101,14 @@ module Formalism
 				options[:form],
 				&options.fetch(:initialize, ->(form) { form.new(*args) })
 			)
+		end
+
+		def instance_respond_to?(name)
+			@instance.respond_to?(name)
+		end
+
+		def instance_public_send(name)
+			@instance.public_send(name)
 		end
 
 		def merge_errors_of_nested_forms

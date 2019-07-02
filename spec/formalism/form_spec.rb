@@ -70,6 +70,8 @@ describe Formalism::Form do
 	let(:correct_album_params) { { title: 'Foo', year: 2018 } }
 	let(:incorrect_album_params) { { year: 3018 } }
 
+	let(:form) { form_class.new(params) }
+
 	after do
 		ObjectSpace.each_object(Class).each do |model|
 			next unless model < Model
@@ -127,8 +129,6 @@ describe Formalism::Form do
 				end
 			end
 		end
-
-		let(:form) { form_class.new(params) }
 
 		let(:not_coerced_time) { '2018-05-03 14:02:21' }
 
@@ -854,6 +854,44 @@ describe Formalism::Form do
 				let(:params) { { inner_form: :from_params } }
 
 				it { is_expected.to eq(inner_form: :from_params) }
+			end
+		end
+	end
+
+	describe 'redefine methods for filling from instance' do
+		let(:model) { Model.new(:id) }
+
+		let(:form_class) do
+			Class.new(described_class) do
+				field :id, Array, of: Integer
+
+				private
+
+				def instance_respond_to?(name)
+					@instance.first&.respond_to?(name)
+				end
+
+				def instance_public_send(name)
+					@instance.map { |instance| instance.public_send(name) }
+				end
+			end
+		end
+
+		describe '`:id` field' do
+			subject { form.id }
+
+			let(:correct_id) { [2, 5, 6] }
+
+			context 'when initialized from Array of Integer' do
+				let(:params) { { id: correct_id } }
+
+				it { is_expected.to eq correct_id }
+			end
+
+			context 'when initialized from Array of instances' do
+				let(:params) { correct_id.map { |id| model.new(id: id) } }
+
+				it { is_expected.to eq correct_id }
 			end
 		end
 	end
