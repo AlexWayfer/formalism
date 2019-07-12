@@ -858,6 +858,63 @@ describe Formalism::Form do
 		end
 	end
 
+	describe 'redefine methods for filling from params' do
+		let(:user_class) { Model.new(:name, :role) }
+		let(:article_class) { Model.new(:title, :author) }
+
+		let(:author_form_class) do
+			Class.new(described_class) do
+				field :name, String
+				field :role
+			end
+		end
+
+		let(:form_class) do
+			author_form_class = self.author_form_class
+
+			Class.new(described_class) do
+				nested :author, author_form_class
+
+				private
+
+				def params_for_nested_form(name)
+					super.merge(
+						case name
+						when :author then { role: :regular }
+						else {}
+						end
+					)
+				end
+			end
+		end
+
+		describe 'nested form' do
+			describe '`:role` field' do
+				subject { form.author_form.role }
+
+				let(:correct_role) { :regular }
+
+				context 'when initialized by Hash' do
+					let(:params) { { title: 'New post', author: { name: 'Alexander' } } }
+
+					it { is_expected.to eq correct_role }
+				end
+
+				context 'when initialized by instance' do
+					let(:role) { :admin }
+					let(:params) do
+						article_class.new(
+							title: 'New post',
+							author: user_class.new(name: 'Alexander', role: role)
+						)
+					end
+
+					it { is_expected.to eq role }
+				end
+			end
+		end
+	end
+
 	describe 'redefine methods for filling from instance' do
 		let(:model) { Model.new(:id) }
 

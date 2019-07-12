@@ -91,7 +91,7 @@ module Formalism
 
 		def initialize_nested_form(name, options)
 			args =
-				if @params.key?(name) then [@params[name]]
+				if @params.key?(name) then [params_for_nested_form(name)]
 				elsif instance_respond_to?(name) then [instance_public_send(name)]
 				elsif options.key?(:default) then [process_default(options[:default])]
 				else []
@@ -101,6 +101,10 @@ module Formalism
 				options[:form],
 				&options.fetch(:initialize, ->(form) { form.new(*args) })
 			)
+		end
+
+		def params_for_nested_form(name)
+			@params[name]
 		end
 
 		def instance_respond_to?(name)
