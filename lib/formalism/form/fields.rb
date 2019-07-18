@@ -109,9 +109,10 @@ module Formalism
 				@nested_forms ||= {}
 			end
 
-			def fields_and_nested_forms
-				merging_fields = select_for_merging :fields
-				merging_nested_forms = select_for_merging :nested_forms
+			def fields_and_nested_forms(select: true)
+				merging_fields = select ? select_for_merging(:fields) : fields
+				merging_nested_forms =
+					select ? select_for_merging(:nested_forms) : nested_forms
 
 				merging_fields.merge(
 					merging_nested_forms

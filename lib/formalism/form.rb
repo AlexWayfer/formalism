@@ -57,12 +57,31 @@ module Formalism
 		def validate; end
 
 		def fill_fields_and_nested_forms
-			self.class.fields_and_nested_forms.each do |name, options|
-				if options.key?(:form)
-					fill_nested_form name, options
-				else
-					fill_field name, options
+			self.class.fields_and_nested_forms.each_key do |name|
+				fill_field_or_nested_form name
+			end
+		end
+
+		def fill_field_or_nested_form(name)
+			options = self.class.fields_and_nested_forms[name]
+
+			fill_depends(*options[:depends_on])
+
+			if options.key?(:form)
+				fill_nested_form name, options
+			else
+				fill_field name, options
+			end
+		end
+
+		def fill_depends(*depends_on)
+			depends_on.each do |depends_name|
+				if !self.class.fields_and_nested_forms.key?(depends_name) ||
+						fields_and_nested_forms(select: false).key?(depends_name)
+					next
 				end
+
+				fill_field_or_nested_form depends_name
 			end
 		end
 

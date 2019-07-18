@@ -521,6 +521,22 @@ describe Formalism::Form do
 
 			it { is_expected.to eq(foo: :from_params) }
 		end
+
+		describe ':depends_on option' do
+			let(:form_class) do
+				Class.new(described_class) do
+					field :foo, default: -> { bar }, depends_on: :bar
+					field :bar
+					field :baz, default: -> { bar * qux }, depends_on: %i[bar qux]
+					field :qux
+					field :quxx, depends_on: :attribute
+				end
+			end
+
+			let(:params) { { bar: 2, qux: 4 } }
+
+			it { is_expected.to eq(foo: 2, bar: 2, baz: 8, qux: 4) }
+		end
 	end
 
 	describe '#fields' do
