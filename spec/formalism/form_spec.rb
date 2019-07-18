@@ -877,13 +877,8 @@ describe Formalism::Form do
 
 				private
 
-				def params_for_nested_form(name)
-					super.merge(
-						case name
-						when :author then { role: :regular }
-						else {}
-						end
-					)
+				def params_for_nested_author
+					super.merge(role: :regular)
 				end
 			end
 		end

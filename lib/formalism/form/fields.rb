@@ -64,6 +64,10 @@ module Formalism
 						define_method("#{name}_form") { nested_forms[name] }
 
 						define_method(name) { nested_forms[name].instance }
+
+						private
+
+						define_method("params_for_nested_#{name}") { @params[name] }
 					end
 				end
 
