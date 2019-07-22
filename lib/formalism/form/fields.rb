@@ -108,8 +108,9 @@ module Formalism
 			end
 
 			def select_for_merging(type)
-				send(type).select do |name, _value|
-					self.class.fields_and_nested_forms[name].fetch(:merge, true)
+				send(type).select do |name, value|
+					merge = self.class.fields_and_nested_forms[name].fetch(:merge, true)
+					merge.is_a?(Proc) ? instance_exec(value, &merge) : merge
 				end
 			end
 		end

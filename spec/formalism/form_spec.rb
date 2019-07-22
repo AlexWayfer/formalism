@@ -428,9 +428,69 @@ describe Formalism::Form do
 		end
 
 		describe ':merge option' do
-			let(:params) { { id: 2 } }
+			subject { form.send(:fields_and_nested_forms) }
 
-			it { expect { form.run }.not_to raise_error }
+			let(:nested_form_class) do
+				Class.new(described_class) do
+					field :number
+
+					def instance
+						number * 2
+					end
+
+					private
+
+					def validate
+						return if number == 42
+
+						errors.add 'Number is not correct.'
+					end
+				end
+			end
+
+			let(:form_class) do
+				nested_form_class = self.nested_form_class
+
+				Class.new(described_class) do
+					field :foo
+					field :bar, merge: true
+					field :baz, merge: false
+					field :qux, merge: proc { baz == 5 }
+					nested :nested, nested_form_class, merge: ->(form) { form.valid? }
+
+					private
+
+					def execute
+						@instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
+					end
+				end
+			end
+
+			context 'without params' do
+				let(:params) { {} }
+
+				it { is_expected.to eq({}) }
+			end
+
+			context 'with params' do
+				let(:params) do
+					{ foo: 1, bar: 2, baz: baz, qux: 4, nested: { number: number } }
+				end
+
+				context 'when lambda returns `false`' do
+					let(:baz) { 3 }
+					let(:number) { 2 }
+
+					it { is_expected.to eq foo: 1, bar: 2 }
+				end
+
+				context 'when lambda returns `true`' do
+					let(:baz) { 5 }
+					let(:number) { 42 }
+
+					it { is_expected.to eq foo: 1, bar: 2, qux: 4, nested: 84 }
+				end
+			end
 		end
 
 		describe 'values from params is more important than from @instance' do
