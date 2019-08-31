@@ -1,54 +1,67 @@
 # frozen_string_literal: true
 
 describe Formalism::Form::Fields do
-	Inner = Struct.new(:name)
+	before do
+		stub_const 'Inner', Struct.new(:name)
+	end
 
-	class InnerForm < Formalism::Form
-		field :name, String
+	let(:inner_form_class) do
+		Class.new(Formalism::Form) do
+			field :name, String
 
-		## https://github.com/rubocop-hq/rubocop-rspec/issues/750
-		# rubocop:disable RSpec/InstanceVariable
-		def initialize(*args)
-			super
+			def initialize(*args)
+				super
 
-			return if defined?(@instance)
+				return if defined?(@instance)
 
-			@instance = Inner.new(fields_and_nested_forms)
+				@instance = Inner.new(fields_and_nested_forms)
+			end
 		end
-		# rubocop:enable RSpec/InstanceVariable
 	end
 
-	module BaseModule
-		include Formalism::Form::Fields
+	let(:base_module) do
+		inner_form_class = self.inner_form_class
 
-		field :foo
+		Module.new do
+			include Formalism::Form::Fields
 
-		nested :inner, InnerForm
+			field :foo
+
+			nested :inner, inner_form_class
+		end
 	end
 
-	module AnotherBaseModule
-		include BaseModule
+	let(:another_base_module) do
+		base_module = self.base_module
 
-		field :bar, Integer
+		Module.new do
+			include base_module
+
+			field :bar, Integer
+		end
 	end
 
-	class MainForm < Formalism::Form
-		include AnotherBaseModule
+	let(:main_form_class) do
+		another_base_module = self.another_base_module
+
+		Class.new(Formalism::Form) do
+			include another_base_module
+		end
 	end
 
 	let(:main_form) do
-		MainForm.new(foo: 'foo', bar: '2', inner: { name: 'Alex' })
+		main_form_class.new(foo: 'foo', bar: '2', inner: { name: 'Alex' })
 	end
 
 	describe '.fields_and_nested_forms' do
-		subject { MainForm.fields_and_nested_forms }
+		subject { main_form_class.fields_and_nested_forms }
 
 		let(:result_hash) do
 			{
 				foo: { type: nil },
 				bar: { type: Integer },
 				inner: {
-					form: InnerForm
+					form: inner_form_class
 				}
 			}
 		end
@@ -66,36 +79,45 @@ describe Formalism::Form::Fields do
 		subject { form.send :fields_and_nested_forms }
 
 		describe 'defaults' do
-			class InnerWithDefaultForm < Formalism::Form
-				field :name
+			let(:inner_with_default_form_class) do
+				Class.new(Formalism::Form) do
+					field :name
 
-				## https://github.com/rubocop-hq/rubocop-rspec/issues/750
-				# rubocop:disable RSpec/InstanceVariable
-				def initialize(*args)
-					super
+					def initialize(*args)
+						super
 
-					return if defined?(@instance)
+						return if defined?(@instance)
 
-					@instance = Inner.new(fields_and_nested_forms)
+						@instance = Inner.new(fields_and_nested_forms)
+					end
 				end
-				# rubocop:enable RSpec/InstanceVariable
 			end
 
-			module ModuleWithDefaults
-				include Formalism::Form::Fields
+			let(:module_with_defaults) do
+				inner_form_class = self.inner_form_class
+				inner_with_default_form_class = self.inner_with_default_form_class
 
-				field :one
-				field :two, default: 2
+				Module.new do
+					include Formalism::Form::Fields
 
-				nested :inner, InnerForm
-				nested :inner_with_default, InnerWithDefaultForm, default: :entity
+					field :one
+					field :two, default: 2
+
+					nested :inner, inner_form_class
+					nested :inner_with_default, inner_with_default_form_class,
+						default: :entity
+				end
 			end
 
-			class FormWithDefaults < Formalism::Form
-				include ModuleWithDefaults
+			let(:form_with_defaults_class) do
+				module_with_defaults = self.module_with_defaults
 
-				field :three
-				field :four, default: 4
+				Class.new(Formalism::Form) do
+					include module_with_defaults
+
+					field :three
+					field :four, default: 4
+				end
 			end
 
 			let(:params) do
@@ -130,7 +152,7 @@ describe Formalism::Form::Fields do
 			end
 
 			context 'when regular' do
-				let(:form) { FormWithDefaults.new(params) }
+				let(:form) { form_with_defaults_class.new(params) }
 
 				context 'with params' do
 					it { is_expected.to eq result_with_params }
@@ -144,25 +166,31 @@ describe Formalism::Form::Fields do
 			end
 
 			context 'with refined options for .field and .nested' do
-				class FormWithRefinedDefaults < Formalism::Form
-					class << self
-						%i[field nested].each do |method_name|
-							define_method method_name do |name, type_or_form = nil, **options|
-								options[:default] =
-									options.fetch(:default, -> { :refined_default })
+				let(:form_with_refined_defaults_class) do
+					module_with_defaults = self.module_with_defaults
 
-								super(name, type_or_form, **options)
+					Class.new(Formalism::Form) do
+						class << self
+							%i[field nested].each do |method_name|
+								define_method(
+									method_name
+								) do |name, type_or_form = nil, **options|
+									options[:default] =
+										options.fetch(:default, -> { :refined_default })
+
+									super(name, type_or_form, **options)
+								end
 							end
 						end
+
+						include module_with_defaults
+
+						field :three
+						field :four, default: 4
 					end
-
-					include ModuleWithDefaults
-
-					field :three
-					field :four, default: 4
 				end
 
-				let(:form) { FormWithRefinedDefaults.new(params) }
+				let(:form) { form_with_refined_defaults_class.new(params) }
 
 				context 'with params' do
 					it { is_expected.to eq result_with_params }
@@ -188,22 +216,20 @@ describe Formalism::Form::Fields do
 		end
 
 		describe 'redefined accessors' do
-			before do
-				stub_const(
-					'FormWithRedefinedAccessors', Class.new(Formalism::Form) do
-						field :foo, Symbol
-						field :status, Symbol
+			let(:form_with_redefined_accessors_class) do
+				Class.new(Formalism::Form) do
+					field :foo, Symbol
+					field :status, Symbol
 
-						private
+					private
 
-						def status=(value)
-							super unless value == 'all'
-						end
+					def status=(value)
+						super unless value == 'all'
 					end
-				)
+				end
 			end
 
-			let(:form) { FormWithRedefinedAccessors.new(params) }
+			let(:form) { form_with_redefined_accessors_class.new(params) }
 
 			context "with 'all' status (don't call `super`)" do
 				let(:params) { { foo: 'bar', status: 'all' } }

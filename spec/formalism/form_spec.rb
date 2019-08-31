@@ -1,71 +1,81 @@
 # frozen_string_literal: true
 
 describe Formalism::Form do
-	YEAR_RANGE = (0..Time.now.year).freeze
+	subject(:album_form) { album_form_class.new(params) }
 
-	class Model < Struct
-		attr_reader :id
+	before do
+		stub_const 'YEAR_RANGE', 0..Time.now.year
 
-		def self.all
-			@all ||= []
-		end
+		stub_const(
+			'Model', Class.new(Struct) do
+				attr_reader :id
 
-		def self.create(params)
-			new(params).save
-		end
+				def self.all
+					@all ||= []
+				end
 
-		def self.find(params)
-			all.find do |record|
-				params.all? { |key, value| record.public_send(key) == value }
+				def self.create(params)
+					new(params).save
+				end
+
+				def self.find(params)
+					all.find do |record|
+						params.all? { |key, value| record.public_send(key) == value }
+					end
+				end
+
+				def self.find_or_create(params)
+					find(params) || new(params).save
+				end
+
+				def initialize(**columns)
+					columns.each do |column, value|
+						public_send "#{column}=", value
+					end
+				end
+
+				def id=(_value)
+					raise ArgumentError, 'id is a restricted primary key'
+				end
+
+				def save
+					all = self.class.all
+					@id ||= all.last&.id.to_i.next
+					all.delete_if { |record| record.id == id }
+					all.push self
+					self
+				end
 			end
-		end
+		)
 
-		def self.find_or_create(params)
-			find(params) || new(params).save
-		end
-
-		def initialize(**columns)
-			columns.each do |column, value|
-				public_send "#{column}=", value
-			end
-		end
-
-		def id=(_value)
-			raise ArgumentError, 'id is a restricted primary key'
-		end
-
-		def save
-			all = self.class.all
-			@id ||= all.last&.id.to_i.next
-			all.delete_if { |record| record.id == id }
-			all.push self
-			self
-		end
+		stub_const(
+			'Album', Model.new(
+				:title, :year, :artist, :tag, :label, :genre, :producer
+			)
+		)
 	end
 
-	Album = Model.new(:title, :year, :artist, :tag, :label, :genre, :producer)
+	let(:album_form_class) do
+		Class.new(described_class) do
+			field :id, Integer, merge: false
+			field :title
+			field :year, Integer
 
-	class AlbumForm < described_class
-		field :id, Integer, merge: false
-		field :title
-		field :year, Integer
+			private
 
-		private
+			def validate
+				errors.add('Album title is not present') if title.to_s.empty?
 
-		def validate
-			errors.add('Album title is not present') if title.to_s.empty?
+				return if YEAR_RANGE.include? year
 
-			return if YEAR_RANGE.include? year
+				errors.add("Album year is not in #{YEAR_RANGE}")
+			end
 
-			errors.add("Album year is not in #{YEAR_RANGE}")
-		end
-
-		def execute
-			@instance = Album.create(fields_and_nested_forms)
+			def execute
+				@instance = Album.create(fields_and_nested_forms)
+			end
 		end
 	end
-
-	subject(:album_form) { AlbumForm.new(params) }
 
 	let(:correct_album_params) { { title: 'Foo', year: 2018 } }
 	let(:incorrect_album_params) { { year: 3018 } }
@@ -125,7 +135,8 @@ describe Formalism::Form do
 				private
 
 				def execute
-					@instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
+					@instance =
+						Model.new(:foo, :bar).create(fields_and_nested_forms)
 				end
 			end
 		end
@@ -613,137 +624,157 @@ describe Formalism::Form do
 	end
 
 	describe '.nested' do
-		Artist = Model.new(:name)
-		Tag = Model.new(:name)
-		Label = Model.new(:name)
-
-		class ArtistForm < described_class
-			field :name
-
-			private
-
-			def validate
-				return unless name.to_s.empty?
-
-				errors.add('Artist name is not present')
-			end
-
-			def execute
-				@instance = Artist.find_or_create(fields_and_nested_forms)
-			end
+		before do
+			stub_const 'Artist', Model.new(:name)
+			stub_const 'Tag', Model.new(:name)
+			stub_const 'Label', Model.new(:name)
 		end
 
-		class TagForm < described_class
-			field :name, String
+		let(:artist_form_class) do
+			Class.new(described_class) do
+				field :name
 
-			private
+				private
 
-			def validate
-				return unless name.to_s.empty?
+				def validate
+					return unless name.to_s.empty?
 
-				errors.add('Tag name is not present')
-			end
-
-			def execute
-				@instance = Tag.find_or_create(fields_and_nested_forms)
-			end
-		end
-
-		class LabelForm < described_class
-			def initialize(name)
-				@name = name
-			end
-
-			private
-
-			def execute
-				## https://github.com/rubocop-hq/rubocop-rspec/issues/750
-				# rubocop:disable RSpec/InstanceVariable
-				@instance = Label.find_or_create(name: @name)
-				# rubocop:enable RSpec/InstanceVariable
-			end
-		end
-
-		class CompositorForm < described_class
-			field :name
-
-			private
-
-			def validate
-				return unless name.to_s.empty?
-
-				errors.add('Compositor name is not present')
-			end
-
-			def execute
-				@instance = Compositor.find_or_create(fields_and_nested_forms)
-			end
-		end
-
-		class ProducerForm < described_class
-			extend Forwardable
-
-			def_delegator :artist_form, :instance
-
-			field :name
-
-			nested :artist, ArtistForm,
-				initialize: ->(form) { form.new(fields_and_nested_forms) },
-				errors_key: nil
-
-			private
-
-			def execute
-				artist_form.run
-			end
-		end
-
-		class AlbumWithNestedForm < AlbumForm
-			nested :artist, ArtistForm
-
-			nested :tag, TagForm, default: -> { default_tag }
-
-			nested :label, LabelForm,
-				initialize: ->(form) { form.new(params[:label_name]) }
-
-			field :genre, default: -> { label }
-
-			nested :compositor, initialize: (
-				proc do
-					(artist_form.valid? ? ArtistForm : CompositorForm)
-						.new(params[artist_form.valid? ? :artist : :compositor])
+					errors.add('Artist name is not present')
 				end
-			), merge: false
 
-			nested :update_something, initialize: ->(_form) { nil }
-
-			nested :hashtag, TagForm, merge: false
-
-			nested :producer, ProducerForm
-
-			private
-
-			def execute
-				artist_form.run
-				tag_form.run
-				label_form.run
-				producer_form.run
-				super
-			end
-
-			def default_tag
-				Tag.new(name: 'default')
+				def execute
+					@instance = Artist.find_or_create(fields_and_nested_forms)
+				end
 			end
 		end
 
-		let(:album_with_nested_form) { AlbumWithNestedForm.new(params) }
+		let(:tag_form_class) do
+			Class.new(described_class) do
+				field :name, String
+
+				private
+
+				def validate
+					return unless name.to_s.empty?
+
+					errors.add('Tag name is not present')
+				end
+
+				def execute
+					@instance = Tag.find_or_create(fields_and_nested_forms)
+				end
+			end
+		end
+
+		let(:label_form_class) do
+			Class.new(described_class) do
+				def initialize(name)
+					@name = name
+				end
+
+				private
+
+				def execute
+					@instance = Label.find_or_create(name: @name)
+				end
+			end
+		end
+
+		let(:compositor_form_class) do
+			Class.new(described_class) do
+				field :name
+
+				private
+
+				def validate
+					return unless name.to_s.empty?
+
+					errors.add('Compositor name is not present')
+				end
+
+				def execute
+					@instance = Compositor.find_or_create(fields_and_nested_forms)
+				end
+			end
+		end
+
+		let(:producer_form_class) do
+			artist_form_class = self.artist_form_class
+
+			Class.new(described_class) do
+				extend Forwardable
+
+				def_delegator :artist_form, :instance
+
+				field :name
+
+				nested :artist, artist_form_class,
+					initialize: ->(form) { form.new(fields_and_nested_forms) },
+					errors_key: nil
+
+				private
+
+				def execute
+					artist_form.run
+				end
+			end
+		end
+
+		let(:album_with_nested_form_class) do
+			artist_form_class = self.artist_form_class
+			tag_form_class = self.tag_form_class
+			label_form_class = self.label_form_class
+			compositor_form_class = self.compositor_form_class
+			producer_form_class = self.producer_form_class
+
+			Class.new(album_form_class) do
+				nested :artist, artist_form_class
+
+				nested :tag, tag_form_class, default: -> { default_tag }
+
+				nested :label, label_form_class,
+					initialize: ->(form) { form.new(params[:label_name]) }
+
+				field :genre, default: -> { label }
+
+				nested :compositor, initialize: (
+					proc do
+						(artist_form.valid? ? artist_form_class : compositor_form_class)
+							.new(params[artist_form.valid? ? :artist : :compositor])
+					end
+				), merge: false
+
+				nested :update_something, initialize: ->(_form) { nil }
+
+				nested :hashtag, tag_form_class, merge: false
+
+				nested :producer, producer_form_class
+
+				private
+
+				def execute
+					artist_form.run
+					tag_form.run
+					label_form.run
+					producer_form.run
+					super
+				end
+
+				def default_tag
+					Tag.new(name: 'default')
+				end
+			end
+		end
+
+		let(:album_with_nested_form) { album_with_nested_form_class.new(params) }
 
 		context 'without form and :initialize parameters' do
 			it do
-				expect { AlbumWithNestedForm.nested :incorrect_form }.to raise_error(
-					ArgumentError,
-					'Neither form class nor initialize block is not present'
-				)
+				expect { album_with_nested_form_class.nested :incorrect_form }
+					.to raise_error(
+						ArgumentError,
+						'Neither form class nor initialize block is not present'
+					)
 			end
 		end
 
