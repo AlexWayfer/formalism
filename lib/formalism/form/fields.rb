@@ -64,10 +64,23 @@ module Formalism
 						define_method("#{name}_form") { nested_forms[name] }
 
 						define_method(name) { nested_forms[name].instance }
+					end
 
+					define_params_for_nested_method name
+				end
+
+				def define_params_for_nested_method(name)
+					params_method_name = "params_for_nested_#{name}"
+					params_method_defined =
+						method_defined?(params_method_name) ||
+						private_method_defined?(params_method_name)
+
+					module_for_accessors.instance_exec do
 						private
 
-						define_method("params_for_nested_#{name}") { @params[name] }
+						unless params_method_defined
+							define_method(params_method_name) { @params[name] }
+						end
 					end
 				end
 

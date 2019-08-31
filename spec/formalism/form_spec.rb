@@ -918,7 +918,7 @@ describe Formalism::Form do
 		end
 	end
 
-	describe 'redefine methods for filling from params' do
+	describe 'redefinition methods for filling from params' do
 		let(:user_class) { Model.new(:name, :role) }
 		let(:article_class) { Model.new(:title, :author) }
 
@@ -943,7 +943,7 @@ describe Formalism::Form do
 			end
 		end
 
-		describe 'nested form' do
+		describe '`author` nested form' do
 			describe '`:role` field' do
 				subject { form.author_form.role }
 
@@ -966,6 +966,43 @@ describe Formalism::Form do
 
 					it { is_expected.to eq role }
 				end
+			end
+		end
+
+		context 'when defined in module before any definition of nesting form' do
+			let(:book_form_class) do
+				Class.new(described_class) do
+					field :titile, String
+					field :published
+				end
+			end
+
+			let(:book_module) do
+				book_form_class = self.book_form_class
+
+				Module.new do
+					include Formalism::Form::Fields
+
+					nested :book, book_form_class
+
+					private
+
+					def params_for_nested_book
+						super.merge(published: true)
+					end
+				end
+			end
+
+			before do
+				form_class.include book_module
+			end
+
+			describe '`:published` field' do
+				subject { form.book_form.published }
+
+				let(:params) { { title: 'New post', book: { title: 'Cool' } } }
+
+				it { is_expected.to be true }
 			end
 		end
 	end
