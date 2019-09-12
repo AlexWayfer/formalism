@@ -521,22 +521,6 @@ describe Formalism::Form do
 
 			it { is_expected.to eq(foo: :from_params) }
 		end
-
-		describe ':depends_on option' do
-			let(:form_class) do
-				Class.new(described_class) do
-					field :foo, default: -> { bar }, depends_on: :bar
-					field :bar
-					field :baz, default: -> { bar * qux }, depends_on: %i[bar qux]
-					field :qux
-					field :quxx, depends_on: :attribute
-				end
-			end
-
-			let(:params) { { bar: 2, qux: 4 } }
-
-			it { is_expected.to eq(foo: 2, bar: 2, baz: 8, qux: 4) }
-		end
 	end
 
 	describe '#fields' do
@@ -961,6 +945,54 @@ describe Formalism::Form do
 				let(:params) { { inner_form: :from_params } }
 
 				it { is_expected.to eq(inner_form: :from_params) }
+			end
+		end
+
+		describe ':depends_on option' do
+			subject { form_class.new(params).send :fields_and_nested_forms }
+
+			let(:bar_form_class) do
+				Class.new(described_class) do
+					class << self
+						attr_writer :initialized_times
+
+						def initialized_times
+							@initialized_times ||= 0
+						end
+					end
+
+					def initialize(*)
+						self.class.initialized_times += 1
+
+						super
+					end
+				end
+			end
+
+			let(:form_class) do
+				bar_form_class = self.bar_form_class
+
+				Class.new(described_class) do
+					field :foo, default: -> { bar }, depends_on: :bar
+					nested :bar, bar_form_class
+					field :baz, default: -> { bar * qux }, depends_on: %i[bar qux]
+					field :qux
+					field :quxx, depends_on: :attribute
+				end
+			end
+
+			let(:params) { { bar: 2, qux: 4 } }
+
+			it { is_expected.to eq(foo: 2, bar: 2, baz: 8, qux: 4) }
+
+			describe 'filling times' do
+				subject { bar_form_class.initialized_times }
+
+				before do
+					form
+				end
+
+				it { is_expected.to eq 1 }
 			end
 		end
 	end
