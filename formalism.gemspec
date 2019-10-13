@@ -20,12 +20,12 @@ Gem::Specification.new do |s|
 
 	s.add_dependency 'gorilla_patch', '~> 3'
 
-	s.add_development_dependency 'codecov', '~> 0'
-	s.add_development_dependency 'pry-byebug', '~> 3'
-	s.add_development_dependency 'rake', '~> 13'
-	s.add_development_dependency 'rspec', '~> 3'
+	s.add_development_dependency 'codecov', '~> 0.1.15'
+	s.add_development_dependency 'pry-byebug', '~> 3.7'
+	s.add_development_dependency 'rake', '~> 13.0'
+	s.add_development_dependency 'rspec', '~> 3.9'
 	s.add_development_dependency 'rubocop', '~> 0.75.0'
 	s.add_development_dependency 'rubocop-performance', '~> 1.1'
-	s.add_development_dependency 'rubocop-rspec', '~> 1.35.0'
-	s.add_development_dependency 'simplecov', '~> 0'
+	s.add_development_dependency 'rubocop-rspec', '~> 1.36'
+	s.add_development_dependency 'simplecov', '~> 0.17.1'
 end
