@@ -82,7 +82,7 @@ describe Formalism::Form::Fields do
 		end
 
 		context 'with filtering' do
-			subject { main_form.fields(select: true) }
+			subject { main_form.fields(for_merge: true) }
 
 			it { is_expected.to eq(foo: 'foo', bar: 2) }
 		end
