@@ -99,8 +99,12 @@ module Formalism
 
 			extend ClassMethods
 
-			def fields
+			def fields(select: false)
 				@fields ||= {}
+
+				return @fields unless select
+
+				select_for_merging(:fields)
 			end
 
 			private
@@ -110,11 +114,10 @@ module Formalism
 			end
 
 			def fields_and_nested_forms(select: true)
-				merging_fields = select ? select_for_merging(:fields) : fields
 				merging_nested_forms =
 					select ? select_for_merging(:nested_forms) : nested_forms
 
-				merging_fields.merge(
+				fields(select: select).merge(
 					merging_nested_forms
 						.map { |name, _nested_form| [name, public_send(name)] }
 						.to_h

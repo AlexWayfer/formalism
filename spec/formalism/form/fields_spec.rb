@@ -38,6 +38,8 @@ describe Formalism::Form::Fields do
 			include base_module
 
 			field :bar, Integer
+
+			field :baz, merge: false
 		end
 	end
 
@@ -50,7 +52,9 @@ describe Formalism::Form::Fields do
 	end
 
 	let(:main_form) do
-		main_form_class.new(foo: 'foo', bar: '2', inner: { name: 'Alex' })
+		main_form_class.new(
+			foo: 'foo', bar: '2', baz: true, inner: { name: 'Alex' }
+		)
 	end
 
 	describe '.fields_and_nested_forms' do
@@ -60,6 +64,7 @@ describe Formalism::Form::Fields do
 			{
 				foo: { type: nil },
 				bar: { type: Integer },
+				baz: { type: nil, merge: false },
 				inner: {
 					form: inner_form_class
 				}
@@ -70,9 +75,17 @@ describe Formalism::Form::Fields do
 	end
 
 	describe '#fields' do
-		subject { main_form.fields }
+		context 'without filtering (default)' do
+			subject { main_form.fields }
 
-		it { is_expected.to eq(foo: 'foo', bar: 2) }
+			it { is_expected.to eq(foo: 'foo', bar: 2, baz: true) }
+		end
+
+		context 'with filtering' do
+			subject { main_form.fields(select: true) }
+
+			it { is_expected.to eq(foo: 'foo', bar: 2) }
+		end
 	end
 
 	describe '#fields_and_nested_forms' do
