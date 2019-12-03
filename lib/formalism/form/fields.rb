@@ -25,7 +25,7 @@ module Formalism
 				end
 
 				def field(name, type = nil, **options)
-					Coercion.check type, options unless type.nil?
+					Coercion.new(type, options[:of]).check unless type.nil?
 
 					fields_and_nested_forms[name] = options.merge(type: type)
 
@@ -53,8 +53,9 @@ module Formalism
 
 						define_method("#{name}=") do |value|
 							options = self.class.fields_and_nested_forms[name]
-							value = Coercion.new(value, **options.slice(:type, :of)).result
-							fields[name] = value
+							coerced_value =
+								Coercion.new(*options.values_at(:type, :of)).result_for(value)
+							fields[name] = coerced_value
 						end
 					end
 				end

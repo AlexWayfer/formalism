@@ -186,7 +186,7 @@ describe Formalism::Form do
 			it { is_expected.to eq(foo: 1, bar: 2) }
 		end
 
-		describe 'coersion' do
+		describe 'coercion' do
 			context 'when params must be coerced' do
 				let(:params) { not_coerced_params.merge(qux: 4) }
 
