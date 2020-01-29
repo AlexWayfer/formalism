@@ -18,7 +18,7 @@ module Formalism
 				end
 
 				def execute
-					result = @value&.to_a
+					result = @value.to_a
 
 					return result unless @of
 

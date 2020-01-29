@@ -225,6 +225,7 @@ describe Formalism::Form::Coercion do
 			context 'without :of' do
 				let(:of) {}
 
+				it_behaves_like 'it parses nil', []
 				it_behaves_like 'it parses empty array', []
 				it_behaves_like 'it parses empty hash', []
 
@@ -238,6 +239,7 @@ describe Formalism::Form::Coercion do
 			context 'with :of as Integer' do
 				let(:of) { Integer }
 
+				it_behaves_like 'it parses nil', []
 				it_behaves_like 'it parses empty array', []
 				it_behaves_like 'it parses empty hash', []
 
