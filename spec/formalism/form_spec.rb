@@ -424,6 +424,7 @@ describe Formalism::Form do
 			let(:parent_form_class) do
 				Class.new(described_class) do
 					field :foo
+					field :qux
 				end
 			end
 
@@ -433,9 +434,46 @@ describe Formalism::Form do
 				end
 			end
 
-			let(:params) { { foo: 1, bar: '2', baz: Time.now } }
+			let(:params) do
+				{ foo: 1, bar: '2', baz: Time.now, qux: [], quux: 'what?' }
+			end
 
-			it { is_expected.to eq(foo: 1, bar: '2') }
+			it { is_expected.to eq(foo: 1, bar: '2', qux: []) }
+
+			describe '.remove_field' do
+				let(:form_class) do
+					result = super()
+					result.instance_exec do
+						remove_field :qux
+
+						field :quux
+						remove_field :quux
+					end
+					result
+				end
+
+				it { is_expected.to eq(foo: 1, bar: '2') }
+
+				describe 'methods of removed fields' do
+					subject { form_class.method_defined?(:quux) }
+
+					it { is_expected.to be false }
+
+					describe 'child form has no methods of removed fields' do
+						let(:form_class) do
+							Class.new super()
+						end
+
+						it { is_expected.to be false }
+					end
+				end
+
+				describe 'it left methods of removed fields in parent' do
+					subject { form_class.superclass.method_defined?(:qux) }
+
+					it { is_expected.to be true }
+				end
+			end
 		end
 
 		describe ':merge option' do

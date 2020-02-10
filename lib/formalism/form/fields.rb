@@ -45,6 +45,13 @@ module Formalism
 
 				private
 
+				def remove_field(name)
+					fields_and_nested_forms.delete name
+
+					undef_method name
+					undef_method "#{name}="
+				end
+
 				def define_field_methods(name)
 					module_for_accessors.instance_exec do
 						define_method(name) { fields[name] }
