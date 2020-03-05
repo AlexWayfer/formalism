@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 describe Formalism::Form do
-	subject(:album_form) { album_form_class.new(params) }
+	def initialize_album_form
+		album_form_class.new(params)
+	end
+
+	subject(:album_form) { initialize_album_form }
 
 	before do
 		stub_const 'YEAR_RANGE', 0..Time.now.year
@@ -77,6 +81,24 @@ describe Formalism::Form do
 		end
 	end
 
+	let(:tag_form_class) do
+		Class.new(described_class) do
+			field :name, String
+
+			private
+
+			def validate
+				return unless name.to_s.empty?
+
+				errors.add('Tag name is not present')
+			end
+
+			def execute
+				@instance = Tag.find_or_create(fields_and_nested_forms)
+			end
+		end
+	end
+
 	let(:correct_album_params) { { title: 'Foo', year: 2018 } }
 	let(:incorrect_album_params) { { year: 3018 } }
 
@@ -118,6 +140,8 @@ describe Formalism::Form do
 		subject { form.fields }
 
 		let(:form_class) do
+			tag_form_class = self.tag_form_class
+
 			Class.new(described_class) do
 				field :id, Integer, merge: false
 				field :foo
@@ -131,6 +155,7 @@ describe Formalism::Form do
 				field :status, Symbol
 				field :tags, Array
 				field :ids, Array, of: Integer
+				field :hashtags, Array, of: tag_form_class
 
 				private
 
@@ -686,24 +711,6 @@ describe Formalism::Form do
 			end
 		end
 
-		let(:tag_form_class) do
-			Class.new(described_class) do
-				field :name, String
-
-				private
-
-				def validate
-					return unless name.to_s.empty?
-
-					errors.add('Tag name is not present')
-				end
-
-				def execute
-					@instance = Tag.find_or_create(fields_and_nested_forms)
-				end
-			end
-		end
-
 		let(:label_form_class) do
 			Class.new(described_class) do
 				def initialize(name)
@@ -1032,6 +1039,24 @@ describe Formalism::Form do
 
 				it { is_expected.to eq 1 }
 			end
+		end
+	end
+
+	describe '#==' do
+		subject { album_form == initialize_album_form }
+
+		let(:data) { { title: 'Hits', year: 2015 } }
+
+		context 'with params' do
+			let(:params) { data }
+
+			it { is_expected.to be true }
+		end
+
+		context 'with instance' do
+			let(:params) { Album.new(data) }
+
+			it { is_expected.to be true }
 		end
 	end
 

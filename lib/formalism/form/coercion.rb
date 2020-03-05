@@ -14,7 +14,11 @@ module Formalism
 		## Class for coercion (check, initialization)
 		class Coercion
 			def initialize(type, of = nil)
-				@type = type
+				@type, @form_class =
+					if type.is_a?(Class) && type <= Formalism::Form
+					then [:form, type]
+					else [type, nil]
+					end
 				@of = of
 			end
 
@@ -32,7 +36,9 @@ module Formalism
 			def result_for(value)
 				coercion_class = exist? ? const_name : 'Base'
 
-				self.class.const_get(coercion_class, false).new(value, @of).result
+				self.class.const_get(coercion_class, false)
+					.new(value, of: @of, form_class: @form_class)
+					.result
 			end
 
 			private

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
 describe Formalism::Action do
-	subject(:test_action) { test_action_class.new(params) }
+	def initialize_test_action
+		test_action_class.new(params)
+	end
+
+	subject(:test_action) { initialize_test_action }
 
 	let(:test_action_class) do
 		Class.new(described_class) do
@@ -13,10 +17,10 @@ describe Formalism::Action do
 		end
 	end
 
+	let(:params) { { string: 'foo' } }
+
 	describe '#params' do
 		subject { test_action.params }
-
-		let(:params) { { string: 'foo' } }
 
 		it { is_expected.to eq params }
 		it { is_expected.not_to be params }
@@ -30,8 +34,6 @@ describe Formalism::Action do
 
 	shared_examples 'run' do
 		context 'with correct value' do
-			let(:params) { { string: +'foo' } }
-
 			it { is_expected.to eq 'FOO' }
 		end
 
@@ -56,5 +58,11 @@ describe Formalism::Action do
 		subject { test_action_class.run(params) }
 
 		include_examples 'run'
+	end
+
+	describe '#==' do
+		subject { test_action == initialize_test_action }
+
+		it { is_expected.to be true }
 	end
 end

@@ -58,7 +58,14 @@ describe Formalism::Form::Coercion do
 		shared_examples 'it parses nil' do |expected_result = nil|
 			let(:value) { nil }
 
-			it { is_expected.to eql(expected_result) }
+			it do
+				## https://github.com/rspec/rspec-core/issues/2702
+				if expected_result.is_a?(Proc)
+					expected_result = instance_exec(&expected_result)
+				end
+
+				expect(subject).to eql(expected_result)
+			end
 		end
 
 		shared_examples 'it parses empty string' do |expected_result = nil|
@@ -261,6 +268,22 @@ describe Formalism::Form::Coercion do
 				let(:value) { { foo: 'bar', baz: 'qux' } }
 
 				it { is_expected.to be value }
+			end
+		end
+
+		context 'with Form type' do
+			let(:form_class) do
+				Class.new(Formalism::Form)
+			end
+
+			let(:type) { form_class }
+
+			it_behaves_like 'it parses nil', -> { form_class.new(nil) }
+
+			context 'when Hash of Symbol -> String' do
+				let(:value) { { foo: 'bar', baz: 'qux' } }
+
+				it { is_expected.to eq form_class.new(value) }
 			end
 		end
 	end

@@ -22,5 +22,11 @@ module Formalism
 		def run
 			execute
 		end
+
+		def ==(other)
+			params == other.params
+		end
+
+		alias eql? ==
 	end
 end

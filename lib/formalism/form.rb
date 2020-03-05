@@ -46,6 +46,10 @@ module Formalism
 			Outcome.new(errors, super)
 		end
 
+		def ==(other)
+			super && instance == other.instance
+		end
+
 		protected
 
 		def errors

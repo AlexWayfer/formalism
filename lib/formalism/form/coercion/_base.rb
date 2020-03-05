@@ -5,7 +5,7 @@ module Formalism
 		class Coercion
 			## Base class for coercion
 			class Base
-				def initialize(value, *)
+				def initialize(value, **)
 					@value = value
 
 					type_name = self.class.name.split('::')[3..-1].join('::')

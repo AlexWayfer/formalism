@@ -5,8 +5,8 @@ module Formalism
 		class Coercion
 			## Class for coercion to Array
 			class Array < Base
-				def initialize(value, of = nil)
-					super
+				def initialize(value, of: nil, **)
+					super value
 
 					@of = of
 				end
