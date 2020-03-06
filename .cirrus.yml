@@ -1,7 +1,7 @@
 bundle_cache: &bundle_cache
   folder: /usr/local/bundle
   fingerprint_script:
-    - echo $CIRRUS_TASK_NAME:$CIRRUS_OS
+    - echo $CIRRUS_OS
     - ruby -v
     - cat Gemfile
     - cat *.gemspec
