@@ -9,7 +9,7 @@ bundle_cache: &bundle_cache
 
 lint_task:
   container:
-    image: ruby:2.6
+    image: ruby:2.7
   bundle_cache:
     <<: *bundle_cache
   test_script: bundle exec rubocop
@@ -19,6 +19,7 @@ test_task:
     matrix:
       image: ruby:2.5
       image: ruby:2.6
+      image: ruby:2.7
   bundle_cache:
     <<: *bundle_cache
   test_script: bundle exec rake
