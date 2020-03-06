@@ -32,6 +32,15 @@ Layout/FirstHashElementLineBreak:
   Enabled: true
 Layout/MultilineHashKeyLineBreaks:
   Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+
+
 Naming/MethodParameterName:
   AllowedNames:
     - of
