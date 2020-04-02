@@ -2,6 +2,11 @@ require:
   - rubocop-performance
   - rubocop-rspec
 
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+
 Layout/Tab:
   Enabled: false
 Layout/IndentationWidth:
