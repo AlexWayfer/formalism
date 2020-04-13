@@ -7,12 +7,24 @@ bundle_cache: &bundle_cache
     - cat *.gemspec
   populate_script: bundle update
 
-lint_task:
+remark_task:
   container:
-    image: ruby:2.7
+    image: node
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script:
+      - echo $CIRRUS_OS
+      - node -v
+      - cat package.json
+  install_script: npm install
+  lint_script: npm run remark
+
+rubocop_task:
+  container:
+    image: ruby
   bundle_cache:
     <<: *bundle_cache
-  test_script: bundle exec rubocop
+  lint_script: bundle exec rubocop
 
 test_task:
   container:
