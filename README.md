@@ -102,7 +102,7 @@ class CreateAlbumForm < Formalism::Form
 end
 
 form = CreateAlbumForm.new(
-	name: 'Hits', tags: %w[Indie Rock Hits], artist: { name: 'Alex' }
+  name: 'Hits', tags: %w[Indie Rock Hits], artist: { name: 'Alex' }
 )
 form.run
 ```
@@ -223,7 +223,7 @@ But you're able to remove (usually inherited) fields by:
 
 ```ruby
 class ChildForm < ParentForm
-	remove_field :field_from_parent
+  remove_field :field_from_parent
 end
 ```
 
