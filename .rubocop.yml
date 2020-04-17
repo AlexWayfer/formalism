@@ -7,8 +7,8 @@ Lint/RaiseException:
 Lint/StructNewOverride:
   Enabled: true
 
-Layout/Tab:
-  Enabled: false
+Layout/IndentationStyle:
+  EnforcedStyle: tabs
 Layout/IndentationWidth:
   Width: 1
 Layout/MultilineMethodCallIndentation:
@@ -37,6 +37,8 @@ Layout/FirstHashElementLineBreak:
   Enabled: true
 Layout/MultilineHashKeyLineBreaks:
   Enabled: true
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
 
 Style/HashEachMethods:
   Enabled: true
@@ -44,7 +46,8 @@ Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
   Enabled: true
-
+Style/ExponentialNotation:
+  Enabled: true
 
 Naming/MethodParameterName:
   AllowedNames:
