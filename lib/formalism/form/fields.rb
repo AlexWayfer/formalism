@@ -86,9 +86,7 @@ module Formalism
 					module_for_accessors.instance_exec do
 						private
 
-						unless params_method_defined
-							define_method(params_method_name) { @params[name] }
-						end
+						define_method(params_method_name) { @params[name] } unless params_method_defined
 					end
 				end
 

@@ -6,11 +6,16 @@ Lint/RaiseException:
   Enabled: true
 Lint/StructNewOverride:
   Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
 
 Layout/IndentationStyle:
   EnforcedStyle: tabs
+  IndentationWidth: 2
 Layout/IndentationWidth:
   Width: 1
+Layout/LineLength:
+  Max: 100
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented_relative_to_receiver
 Layout/MultilineOperationIndentation:
