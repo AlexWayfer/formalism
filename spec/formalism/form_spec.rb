@@ -28,7 +28,7 @@ describe Formalism::Form do
 					find(params) || new(params).save
 				end
 
-				def initialize(**columns)
+				def initialize(columns)
 					columns.each do |column, value|
 						public_send "#{column}=", value
 					end
