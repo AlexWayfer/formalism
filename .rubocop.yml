@@ -8,6 +8,8 @@ Lint/StructNewOverride:
   Enabled: true
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
 
 Layout/IndentationStyle:
   EnforcedStyle: tabs
@@ -56,6 +58,10 @@ Style/HashTransformValues:
 Style/ExponentialNotation:
   Enabled: true
 Style/SlicingWithRange:
+  Enabled: true
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
   Enabled: true
 
 Naming/MethodParameterName:
