@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
 
 	s.add_dependency 'gorilla_patch', '~> 3'
 
-	s.add_development_dependency 'codecov', '~> 0.1.15'
 	s.add_development_dependency 'pry-byebug', '~> 3.7'
 	s.add_development_dependency 'rake', '~> 13.0'
 	s.add_development_dependency 'rspec', '~> 3.9'

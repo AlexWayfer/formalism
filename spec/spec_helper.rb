@@ -6,11 +6,6 @@ SimpleCov.start do
 end
 SimpleCov.start
 
-if ENV['CODECOV_TOKEN']
-	require 'codecov'
-	SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
-
 require 'pry-byebug'
 
 require_relative '../lib/formalism'
