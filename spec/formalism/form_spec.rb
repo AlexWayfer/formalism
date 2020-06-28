@@ -716,6 +716,7 @@ describe Formalism::Form do
 			Class.new(described_class) do
 				def initialize(name)
 					@name = name
+					super({})
 				end
 
 				private
@@ -1039,6 +1040,55 @@ describe Formalism::Form do
 				end
 
 				it { is_expected.to eq 1 }
+			end
+		end
+
+		describe '#to_params' do
+			subject { album_with_nested_form.to_params }
+
+			context 'with correct params' do
+				let(:params) do
+					correct_album_params.merge(
+						artist: { name: 'Bar' }, producer: { name: 'Producer' },
+						hashtag: { name: '#cool' }
+					)
+				end
+
+				let(:expected_result) do
+					{
+						artist: { name: 'Bar' },
+						compositor: { name: 'Bar' },
+						genre: nil,
+						hashtag: { name: '#cool' },
+						label: {},
+						producer: { artist: { name: 'Producer' }, name: 'Producer' },
+						tag: { name: 'default' },
+						title: 'Foo',
+						year: 2018
+					}
+				end
+
+				it { is_expected.to eq expected_result }
+			end
+
+			context 'with incorrect params' do
+				let(:params) { correct_album_params.merge(artist: { name: '' }) }
+
+				let(:expected_result) do
+					{
+						artist: { name: '' },
+						compositor: {},
+						genre: nil,
+						hashtag: {},
+						label: {},
+						producer: { artist: {} },
+						tag: { name: 'default' },
+						title: 'Foo',
+						year: 2018
+					}
+				end
+
+				it { is_expected.to eq expected_result }
 			end
 		end
 	end

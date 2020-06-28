@@ -113,6 +113,14 @@ module Formalism
 				select_for_merge(:fields)
 			end
 
+			def to_params
+				fields.merge(
+					nested_forms.each_with_object({}) do |(name, nested_form), result|
+						result.merge! nested_form_to_params name, nested_form
+					end
+				)
+			end
+
 			private
 
 			def nested_forms
@@ -135,6 +143,10 @@ module Formalism
 					merge = self.class.fields_and_nested_forms[name].fetch(:merge, true)
 					merge.is_a?(Proc) ? instance_exec(value, &merge) : merge
 				end
+			end
+
+			def nested_form_to_params(name_of_nested_form, nested_form)
+				{ name_of_nested_form => nested_form.to_params }
 			end
 		end
 	end

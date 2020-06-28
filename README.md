@@ -246,6 +246,23 @@ class SomeForm < Formalism::Form
 end
 ```
 
+### Convert to params
+
+You can convert a Form back to (processed) params, for example, for view render:
+
+```ruby
+form = CreateAlbumForm.new(
+  name: 'Hits', tags: %w[Indie Rock Hits], artist: { name: 'Alex' }
+)
+
+form.to_params
+# {
+#   name: 'Hits',
+#   tags: %w[Indie Rock Hits],
+#   artist: { name: 'Alex' }
+# }
+```
+
 ### Actions
 
 For actions without fields, nesting and validation you can use

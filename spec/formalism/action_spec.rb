@@ -13,6 +13,14 @@ describe Formalism::Action do
 		end
 	end
 
+	let(:correct_run_params) do
+		{ string: +'foo' }
+	end
+
+	let(:incorrect_run_params) do
+		{ string: 42 }
+	end
+
 	describe '#params' do
 		subject { test_action.params }
 
@@ -30,13 +38,13 @@ describe Formalism::Action do
 
 	shared_examples 'run' do
 		context 'with correct value' do
-			let(:params) { { string: +'foo' } }
+			let(:params) { correct_run_params }
 
 			it { is_expected.to eq 'FOO' }
 		end
 
 		context 'with incorrect value' do
-			let(:params) { { string: 42 } }
+			let(:params) { incorrect_run_params }
 
 			it do
 				expect { subject }.to raise_error(
