@@ -28,6 +28,8 @@ module Formalism
 		end
 
 		def valid?
+			return unless runnable
+
 			errors.clear
 
 			nested_forms.each_value(&:valid?)
@@ -42,6 +44,8 @@ module Formalism
 		end
 
 		def run
+			return unless runnable
+
 			return Outcome.new(errors) unless valid?
 
 			Outcome.new(errors, super)
@@ -122,10 +126,10 @@ module Formalism
 				else []
 				end
 
-			instance_exec(
-				options[:form],
-				&options.fetch(:initialize, ->(form) { form.new(*args) })
-			)
+			result =
+				instance_exec options[:form], &options.fetch(:initialize, ->(form) { form.new(*args) })
+			result.runnable = false unless runnable
+			result
 		end
 
 		def instance_respond_to?(name)

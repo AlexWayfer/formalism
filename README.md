@@ -212,6 +212,21 @@ field :bar, merge: true
 nested :only_valid, nested_form_class, merge: ->(form) { form.valid? }
 ```
 
+### Runnable
+
+You can disable `#valid?` and `#run` of forms (including nested ones)
+by setting `form.runnable = false`.
+It can be helpful for some cases, for example, with policies (permissions):
+
+```ruby
+def initialize_nested_form(name, options)
+  return unless (form = super)
+
+  form.runnable = allowed_to_change?(name)
+  form
+end
+```
+
 ### Inheritance
 
 Any `class ChildForm < ParentForm` will have all fields and nested forms

@@ -1093,6 +1093,99 @@ describe Formalism::Form do
 		end
 	end
 
+	describe ':runnable' do
+		let(:location_form_class) do
+			Class.new(described_class) do
+				field :address
+
+				private
+
+				def validate
+					errors.add 'Empty address' if address.to_s.empty?
+				end
+
+				def execute
+					{ address: address }
+				end
+			end
+		end
+
+		let(:form_class) do
+			location_form_class = self.location_form_class
+
+			Class.new(described_class) do
+				field :name
+				nested :location, location_form_class
+
+				def initialize(params, runnable)
+					self.runnable = runnable
+
+					super params
+				end
+
+				private
+
+				def validate
+					errors.add 'Empty name' if name.to_s.empty?
+				end
+
+				def execute
+					{ name: name, location: location_form.run }
+				end
+			end
+		end
+
+		let(:form) { form_class.new(params, runnable) }
+
+		let(:params) do
+			{ name: 'Alexander', location: { address: 'Moscow' } }
+		end
+
+		let(:valid_outcome) do
+			nested_forms =
+				params.slice(:location).transform_values { |hash| have_attributes(result: hash) }
+			have_attributes result: params.merge(nested_forms)
+		end
+
+		describe '#valid?' do
+			subject { form.valid? }
+
+			context 'when runnable' do
+				let(:runnable) { true }
+
+				it { is_expected.to be true }
+			end
+
+			context 'when not runnable' do
+				let(:runnable) { false }
+
+				it { is_expected.to be_nil }
+			end
+		end
+
+		describe '#run' do
+			subject { form.run }
+
+			context 'when runnable' do
+				let(:runnable) { true }
+
+				it { is_expected.to valid_outcome }
+			end
+
+			context 'when not runnable' do
+				let(:runnable) { false }
+
+				it { is_expected.to be_nil }
+
+				describe 'nested form' do
+					subject { form.location_form.run }
+
+					it { is_expected.to be_nil }
+				end
+			end
+		end
+	end
+
 	describe 'redefinition methods for filling from params' do
 		let(:user_class) { Model.new(:name, :role) }
 		let(:article_class) { Model.new(:title, :author) }
