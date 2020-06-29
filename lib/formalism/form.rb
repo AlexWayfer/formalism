@@ -133,10 +133,14 @@ module Formalism
 		end
 
 		def instance_respond_to?(name)
+			return false unless defined? @instance
+
 			@instance.respond_to?(name)
 		end
 
 		def instance_public_send(name)
+			return false unless defined? @instance
+
 			@instance.public_send(name)
 		end
 
