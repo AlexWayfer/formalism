@@ -4,7 +4,7 @@ require 'date'
 
 Gem::Specification.new do |s|
 	s.name          = 'formalism'
-	s.version       = '0.0.0'
+	s.version       = '0.1.0'
 	s.date          = Date.today.to_s
 	s.summary       = 'Forms with input data validations and nesting'
 	s.description   = <<~DESC
