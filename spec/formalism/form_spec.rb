@@ -1043,6 +1043,100 @@ describe Formalism::Form do
 			end
 		end
 
+		describe ':merge_errors option' do
+			subject { form.run.errors }
+
+			let(:bar_form_class) do
+				Class.new(described_class) do
+					private
+
+					def validate
+						errors.add "I'm always dissatisfied"
+					end
+
+					def execute; end
+				end
+			end
+
+			let(:base_class) do
+				Class.new(described_class) do
+					private
+
+					def execute; end
+				end
+			end
+
+			let(:params) {}
+
+			let(:non_empty_errors) { Set["I'm always dissatisfied"] }
+
+			context 'when default' do
+				let(:form_class) do
+					bar_form_class = self.bar_form_class
+
+					Class.new(base_class) do
+						nested :bar, bar_form_class
+					end
+				end
+
+				it { is_expected.to eq non_empty_errors }
+			end
+
+			context 'when true' do
+				let(:form_class) do
+					bar_form_class = self.bar_form_class
+
+					Class.new(base_class) do
+						nested :bar, bar_form_class, merge_errors: true
+					end
+				end
+
+				it { is_expected.to eq non_empty_errors }
+			end
+
+			context 'when false' do
+				let(:form_class) do
+					bar_form_class = self.bar_form_class
+
+					Class.new(base_class) do
+						nested :bar, bar_form_class, merge_errors: false
+					end
+				end
+
+				it { is_expected.to be_empty }
+			end
+
+			context 'when proc' do
+				let(:form_class) do
+					bar_form_class = self.bar_form_class
+
+					Class.new(base_class) do
+						nested :bar, bar_form_class, merge_errors: -> { @should_merge_bar }
+
+						def initialize(params, should_merge_bar)
+							super params
+
+							@should_merge_bar = should_merge_bar
+						end
+					end
+				end
+
+				let(:form) { form_class.new(params, should_merge_bar) }
+
+				context 'when true' do
+					let(:should_merge_bar) { true }
+
+					it { is_expected.to eq non_empty_errors }
+				end
+
+				context 'when false' do
+					let(:should_merge_bar) { false }
+
+					it { is_expected.to be_empty }
+				end
+			end
+		end
+
 		describe '#to_params' do
 			subject { album_with_nested_form.to_params }
 

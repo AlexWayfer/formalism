@@ -145,7 +145,18 @@ module Formalism
 		end
 
 		def merge_errors_of_nested_forms
-			nested_forms.each_value { |nested_form| errors.merge(nested_form.errors) }
+			nested_forms.each do |name, nested_form|
+				should_be_merged = self.class.fields_and_nested_forms[name].fetch(:merge_errors, true)
+				should_be_merged = instance_exec(&should_be_merged) if should_be_merged.is_a?(Proc)
+
+				next unless should_be_merged && nested_form.errors.any?
+
+				merge_errors_of_nested_form name, nested_form
+			end
+		end
+
+		def merge_errors_of_nested_form(_name, nested_form)
+			errors.merge nested_form.errors
 		end
 	end
 end
