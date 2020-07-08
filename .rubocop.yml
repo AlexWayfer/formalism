@@ -2,15 +2,6 @@ require:
   - rubocop-performance
   - rubocop-rspec
 
-Lint/RaiseException:
-  Enabled: true
-Lint/StructNewOverride:
-  Enabled: true
-Lint/DeprecatedOpenSSLConstant:
-  Enabled: true
-Lint/MixedRegexpCaptureTypes:
-  Enabled: true
-
 Layout/IndentationStyle:
   EnforcedStyle: tabs
   IndentationWidth: 2
@@ -36,35 +27,6 @@ Layout/MultilineArrayBraceLayout:
   EnforcedStyle: new_line
 Layout/MultilineHashBraceLayout:
   EnforcedStyle: new_line
-Layout/FirstMethodArgumentLineBreak:
-  Enabled: true
-Layout/FirstArrayElementLineBreak:
-  Enabled: true
-Layout/FirstHashElementLineBreak:
-  Enabled: true
-Layout/MultilineHashKeyLineBreaks:
-  Enabled: true
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-Layout/EmptyLinesAroundAttributeAccessor:
-  Enabled: true
-
-Style/HashEachMethods:
-  Enabled: true
-Style/HashTransformKeys:
-  Enabled: true
-Style/HashTransformValues:
-  Enabled: true
-Style/ExponentialNotation:
-  Enabled: true
-Style/SlicingWithRange:
-  Enabled: true
-Style/RedundantRegexpCharacterClass:
-  Enabled: true
-Style/RedundantRegexpEscape:
-  Enabled: true
-Style/RedundantFetchBlock:
-  Enabled: true
 
 Naming/MethodParameterName:
   AllowedNames:
@@ -76,6 +38,7 @@ Metrics/BlockLength:
 
 AllCops:
   TargetRubyVersion: 2.5
+  NewCops: enable
 
 RSpec/NestedGroups:
   Enabled: false
