@@ -11,9 +11,20 @@ Gem::Specification.new do |spec|
 	DESC
 	spec.authors       = ['Alexander Popov']
 	spec.email         = 'alex.wayfer@gmail.com'
-	spec.files         = `git ls-files`.split($RS)
-	spec.homepage      = 'https://github.com/AlexWayfer/formalism'
 	spec.license       = 'MIT'
+
+	source_code_uri = 'https://github.com/AlexWayfer/formalism'
+
+	spec.homepage = source_code_uri
+
+	spec.metadata['source_code_uri'] = source_code_uri
+
+	spec.metadata['homepage_uri'] = spec.homepage
+
+	spec.metadata['changelog_uri'] =
+		'https://github.com/AlexWayfer/formalism/blob/master/CHANGELOG.md'
+
+	spec.files = Dir['lib/**/*.rb', 'README.md', 'LICENSE.txt', 'CHANGELOG.md']
 
 	spec.required_ruby_version = '>= 2.5.0'
 
