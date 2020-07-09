@@ -28,17 +28,19 @@ Layout/MultilineArrayBraceLayout:
 Layout/MultilineHashBraceLayout:
   EnforcedStyle: new_line
 
+Metrics/BlockLength:
+  Exclude:
+    - '*.gemspec'
+    - spec/**/*.rb
+
+## https://github.com/rubocop-hq/rubocop/pull/8294
 Naming/MethodParameterName:
   AllowedNames:
     - of
-
-Metrics/BlockLength:
-  Exclude:
-    - 'spec/**/*.rb'
 
 AllCops:
   TargetRubyVersion: 2.5
   NewCops: enable
 
 RSpec/NestedGroups:
-  Enabled: false
+  Max: 6
