@@ -1,31 +1,35 @@
 # frozen_string_literal: true
 
-require 'date'
+require_relative 'lib/formalism/version'
 
-Gem::Specification.new do |s|
-	s.name          = 'formalism'
-	s.version       = '0.1.0'
-	s.date          = Date.today.to_s
-	s.summary       = 'Forms with input data validations and nesting'
-	s.description   = <<~DESC
+Gem::Specification.new do |spec|
+	spec.name          = 'formalism'
+	spec.version       = Formalism::VERSION
+	spec.summary       = 'Forms with input data validations and nesting'
+	spec.description   = <<~DESC
 		Simple actions and complex forms with validations, nesting, etc.
 	DESC
-	s.authors       = ['Alexander Popov']
-	s.email         = 'alex.wayfer@gmail.com'
-	s.files         = `git ls-files`.split($RS)
-	s.homepage      = 'https://github.com/AlexWayfer/formalism'
-	s.license       = 'MIT'
+	spec.authors       = ['Alexander Popov']
+	spec.email         = 'alex.wayfer@gmail.com'
+	spec.files         = `git ls-files`.split($RS)
+	spec.homepage      = 'https://github.com/AlexWayfer/formalism'
+	spec.license       = 'MIT'
 
-	s.required_ruby_version = '>= 2.5.0'
+	spec.required_ruby_version = '>= 2.5.0'
 
-	s.add_dependency 'gorilla_patch', '~> 4'
+	spec.add_dependency 'gorilla_patch', '~> 4'
 
-	s.add_development_dependency 'codecov', '~> 0.1.15', '!= 0.1.18', '!= 0.1.19'
-	s.add_development_dependency 'pry-byebug', '~> 3.7'
-	s.add_development_dependency 'rake', '~> 13.0'
-	s.add_development_dependency 'rspec', '~> 3.9'
-	s.add_development_dependency 'rubocop', '~> 0.87.0'
-	s.add_development_dependency 'rubocop-performance', '~> 1.1'
-	s.add_development_dependency 'rubocop-rspec', '~> 1.36'
-	s.add_development_dependency 'simplecov', '~> 0.18.1'
+	spec.add_development_dependency 'pry-byebug', '~> 3.9'
+
+	spec.add_development_dependency 'bundler', '~> 2.0'
+	spec.add_development_dependency 'gem_toys', '~> 0.2.0'
+	spec.add_development_dependency 'toys', '~> 0.10.0'
+
+	spec.add_development_dependency 'codecov', '~> 0.1.0', '!= 0.1.18', '!= 0.1.19'
+	spec.add_development_dependency 'rspec', '~> 3.9'
+	spec.add_development_dependency 'simplecov', '~> 0.18.0'
+
+	spec.add_development_dependency 'rubocop', '~> 0.87.0'
+	spec.add_development_dependency 'rubocop-performance', '~> 1.0'
+	spec.add_development_dependency 'rubocop-rspec', '~> 1.0'
 end

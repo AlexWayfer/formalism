@@ -1,4 +1,9 @@
-coverage/
-node_modules/
 Gemfile.lock
+
+/node_modules/
 package-lock.json
+yarn.lock
+
+/coverage/
+
+/pkg/
