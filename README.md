@@ -1,6 +1,12 @@
 # Formalism
 
-[![Build Status](https://api.cirrus-ci.com/github/AlexWayfer/formalism.svg)](https://cirrus-ci.com/github/AlexWayfer/formalism)
+![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/formalism?style=flat-square)
+[![Codecov branch](https://img.shields.io/codecov/c/github/AlexWayfer/formalism/master.svg?style=flat-square)](https://codecov.io/gh/AlexWayfer/formalism)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability/AlexWayfer/formalism.svg?style=flat-square)](https://codeclimate.com/github/AlexWayfer/formalism)
+![Depfu](https://img.shields.io/depfu/AlexWayfer/formalism?style=flat-square)
+[![Inline docs](https://inch-ci.org/github/AlexWayfer/formalism.svg?branch=master)](https://inch-ci.org/github/AlexWayfer/formalism)
+[![license](https://img.shields.io/github/license/AlexWayfer/formalism.svg?style=flat-square)](https://github.com/AlexWayfer/formalism/blob/master/LICENSE)
+[![Gem](https://img.shields.io/gem/v/formalism.svg?style=flat-square)](https://rubygems.org/gems/formalism)
 
 Ruby gem for forms with validations and nesting.
 
@@ -286,13 +292,13 @@ For actions without fields, nesting and validation you can use
 ## Development
 
 After checking out the repo, run `bundle install` to install dependencies.
-Then, run `bundle exec rake spec` to run the tests.
 
-To install this gem onto your local machine, run `bundle exec rake install`.
-To release a new version, update the version number in `version.rb`,
-and then run `bundle exec rake release`, which will create a git tag
-for the version, push git commits and tags, and push the `.gem` file
-to [rubygems.org](https://rubygems.org).
+Then, run `toys rspec` to run the tests.
+
+To install this gem onto your local machine, run `toys gem install`.
+
+To release a new version, run `toys gem release %version%`.
+See how it works [here](https://github.com/AlexWayfer/gem_toys#release).
 
 ## Contributing
 
