@@ -1,11 +1,11 @@
 # Formalism
 
-![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/formalism?style=flat-square)
+[![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/formalism?style=flat-square)](https://cirrus-ci.com/github/AlexWayfer/formalism)
 [![Codecov branch](https://img.shields.io/codecov/c/github/AlexWayfer/formalism/master.svg?style=flat-square)](https://codecov.io/gh/AlexWayfer/formalism)
 [![Code Climate](https://img.shields.io/codeclimate/maintainability/AlexWayfer/formalism.svg?style=flat-square)](https://codeclimate.com/github/AlexWayfer/formalism)
-![Depfu](https://img.shields.io/depfu/AlexWayfer/formalism?style=flat-square)
+[![Depfu](https://img.shields.io/depfu/AlexWayfer/benchmark_toys?style=flat-square)](https://depfu.com/repos/github/AlexWayfer/formalism)
 [![Inline docs](https://inch-ci.org/github/AlexWayfer/formalism.svg?branch=master)](https://inch-ci.org/github/AlexWayfer/formalism)
-[![license](https://img.shields.io/github/license/AlexWayfer/formalism.svg?style=flat-square)](https://github.com/AlexWayfer/formalism/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/AlexWayfer/formalism.svg?style=flat-square)](https://github.com/AlexWayfer/formalism/blob/master/LICENSE.txt)
 [![Gem](https://img.shields.io/gem/v/formalism.svg?style=flat-square)](https://rubygems.org/gems/formalism)
 
 Ruby gem for forms with validations and nesting.
