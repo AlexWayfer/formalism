@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-## TODO: Change after https://github.com/dazuma/toys/issues/48
-require 'bundler/setup'
-Bundler.setup
+include :bundler, static: true
 
 subtool_apply do
 	include :exec, exit_on_nonzero_status: true, log_level: Logger::UNKNOWN unless include? :exec

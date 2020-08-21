@@ -10,7 +10,7 @@ Layout/IndentationWidth:
 Layout/LineLength:
   Max: 100
 Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented_relative_to_receiver
+  EnforcedStyle: indented
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 Layout/ArgumentAlignment:
@@ -18,6 +18,8 @@ Layout/ArgumentAlignment:
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 Layout/FirstArgumentIndentation:
+  EnforcedStyle: consistent
+Layout/FirstParameterIndentation:
   EnforcedStyle: consistent
 Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
@@ -44,3 +46,6 @@ AllCops:
 
 RSpec/NestedGroups:
   Max: 6
+## https://github.com/rubocop-hq/rubocop-rspec/pull/863/files#r471603667
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
