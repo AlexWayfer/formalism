@@ -14,6 +14,8 @@ module Formalism
 		attr_reader :instance
 
 		def self.inherited(child)
+			super
+
 			child.fields_and_nested_forms.merge!(fields_and_nested_forms)
 		end
 
