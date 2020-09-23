@@ -1,15 +1,19 @@
 # frozen_string_literal: true
 
+require 'module_methods'
+
 require_relative 'coercion'
 
 module Formalism
 	class Form < Action
 		## Extend some module or clas with this module for fields
 		module Fields
+			extend ::ModuleMethods::Extension
+
 			## Module for class methods
 			module ClassMethods
 				def included(something)
-					something.extend ClassMethods
+					super
 
 					fields_and_nested_forms.each do |name, options|
 						if options.key?(:form)
@@ -100,10 +104,6 @@ module Formalism
 					mod
 				end
 			end
-
-			private_constant :ClassMethods
-
-			extend ClassMethods
 
 			def fields(for_merge: false)
 				@fields ||= {}
