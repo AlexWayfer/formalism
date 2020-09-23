@@ -6,7 +6,7 @@ require_relative 'coercion'
 
 module Formalism
 	class Form < Action
-		## Extend some module or clas with this module for fields
+		## Extend some module or class with this module for fields
 		module Fields
 			extend ::ModuleMethods::Extension
 
