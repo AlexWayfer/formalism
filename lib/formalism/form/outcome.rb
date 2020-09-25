@@ -22,7 +22,5 @@ module Formalism
 				@result
 			end
 		end
-
-		private_constant :Outcome
 	end
 end
