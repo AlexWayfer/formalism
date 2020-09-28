@@ -2,6 +2,11 @@
 
 ## master (unreleased)
 
+## 0.3.0 (2020-09-28)
+
+*   Add `BigDecimal` coercion.
+*   Support `BigDecimal` for `Float` coercion.
+
 ## 0.2.1 (2020-09-25)
 
 *   Make `Form::Outcome` constant public.
