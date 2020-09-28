@@ -160,6 +160,41 @@ describe Formalism::Form::Coercion do
 			end
 		end
 
+		context 'with BigDecimal type' do
+			let(:type) { BigDecimal }
+
+			it_behaves_like 'it parses nil'
+			it_behaves_like 'it parses empty string'
+			it_behaves_like 'it parses empty array'
+			it_behaves_like 'it parses empty hash'
+
+			context 'when number is String' do
+				context 'without fraction' do
+					let(:value) { '42' }
+
+					it { is_expected.to eq 42.0 }
+				end
+
+				context 'with fraction' do
+					let(:value) { '42.5' }
+
+					it { is_expected.to eq 42.5 }
+				end
+
+				context 'when number is malformed' do
+					let(:value) { '42 km' }
+
+					it { is_expected.to be_nil }
+				end
+
+				context 'with e-notation' do
+					let(:value) { '0.52e-03' }
+
+					it { is_expected.to eq 0.00052 }
+				end
+			end
+		end
+
 		context 'with Time type' do
 			let(:type) { Time }
 
