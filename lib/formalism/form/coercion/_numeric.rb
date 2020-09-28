@@ -18,6 +18,10 @@ module Formalism
 				def execute
 					return unless self.class::VALUE_REGEXP.match? @value.to_s
 
+					send_conversion_method
+				end
+
+				def send_conversion_method
 					@value.public_send(self.class::CONVERSION_METHOD)
 				end
 			end
