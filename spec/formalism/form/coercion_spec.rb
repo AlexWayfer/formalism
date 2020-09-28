@@ -136,6 +136,28 @@ describe Formalism::Form::Coercion do
 					it { is_expected.to be_nil }
 				end
 			end
+
+			context 'when number is BigDecimal' do
+				require 'bigdecimal'
+
+				context 'without fraction' do
+					let(:value) { BigDecimal('42') }
+
+					it { is_expected.to eq 42.0 }
+				end
+
+				context 'with fraction' do
+					let(:value) { BigDecimal('42.5') }
+
+					it { is_expected.to eq 42.5 }
+				end
+
+				context 'with e-notation' do
+					let(:value) { BigDecimal('0.52e-03') }
+
+					it { is_expected.to eq 0.00052 }
+				end
+			end
 		end
 
 		context 'with Time type' do
