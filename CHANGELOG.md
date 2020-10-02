@@ -2,6 +2,10 @@
 
 ## master (unreleased)
 
+## 0.3.1 (2020-10-02)
+
+*   Fix `Float` coercion to `BigDecimal`.
+
 ## 0.3.0 (2020-09-28)
 
 *   Add `BigDecimal` coercion.
