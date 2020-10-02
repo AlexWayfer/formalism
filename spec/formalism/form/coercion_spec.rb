@@ -173,12 +173,14 @@ describe Formalism::Form::Coercion do
 					let(:value) { '42' }
 
 					it { is_expected.to eq 42.0 }
+					it { is_expected.to be_an_instance_of type }
 				end
 
 				context 'with fraction' do
 					let(:value) { '42.5' }
 
 					it { is_expected.to eq 42.5 }
+					it { is_expected.to be_an_instance_of type }
 				end
 
 				context 'when number is malformed' do
@@ -191,7 +193,22 @@ describe Formalism::Form::Coercion do
 					let(:value) { '0.52e-03' }
 
 					it { is_expected.to eq 0.00052 }
+					it { is_expected.to be_an_instance_of type }
 				end
+			end
+
+			context 'when number is Float' do
+				let(:value) { 42.5 }
+
+				it { is_expected.to eq 42.5 }
+				it { is_expected.to be_an_instance_of type }
+			end
+
+			context 'when number is Integer' do
+				let(:value) { 42 }
+
+				it { is_expected.to eq 42 }
+				it { is_expected.to be_an_instance_of type }
 			end
 		end
 

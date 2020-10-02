@@ -10,7 +10,7 @@ module Formalism
 				private
 
 				def send_conversion_method
-					BigDecimal(@value)
+					BigDecimal(@value.to_s)
 				end
 			end
 		end
