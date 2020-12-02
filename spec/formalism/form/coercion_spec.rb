@@ -297,7 +297,7 @@ describe Formalism::Form::Coercion do
 			let(:type) { Array }
 
 			context 'without :of' do
-				let(:of) {}
+				let(:of) { nil }
 
 				it_behaves_like 'it parses nil', []
 				it_behaves_like 'it parses empty array', []

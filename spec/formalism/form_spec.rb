@@ -791,7 +791,7 @@ describe Formalism::Form do
 					end
 				), merge: false
 
-				nested :update_something, initialize: ->(_form) { nil }
+				nested :update_something, initialize: ->(_form) {}
 
 				nested :hashtag, tag_form_class, merge: false
 
@@ -1066,7 +1066,7 @@ describe Formalism::Form do
 				end
 			end
 
-			let(:params) {}
+			let(:params) { nil }
 
 			let(:non_empty_errors) { Set["I'm always dissatisfied"] }
 
