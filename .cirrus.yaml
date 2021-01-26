@@ -46,6 +46,7 @@ rspec_task:
       image: ruby:2.5
       image: ruby:2.6
       image: ruby:2.7
+      image: ruby:3.0
   <<: *bundle_cache
   environment:
     CODECOV_TOKEN: ENCRYPTED[ee9c28ba3e11236da30417cd94307ad22671e1db65b53b4e9c3c6c2cf63049b92f18641832cf18d5fd250f0c4a8c768d]
