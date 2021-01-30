@@ -8,7 +8,7 @@ module Formalism
 				private
 
 				def execute
-					@value && @value.to_s != 'false' ? true : false
+					!@value.nil? && @value.to_s != 'false'
 				end
 			end
 		end
