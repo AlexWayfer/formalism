@@ -2,6 +2,12 @@
 
 ## master (unreleased)
 
+## 0.4.0 (2021-02-11)
+
+*   Support Ruby 3.
+*   Update development dependencies.
+*   Resolve new RuboCop offenses.
+
 ## 0.3.1 (2020-10-02)
 
 *   Fix `Float` coercion to `BigDecimal`.
