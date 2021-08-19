@@ -38,8 +38,7 @@ module Formalism
 
 				def nested(name, form = nil, **options)
 					unless form || options.key?(:initialize)
-						raise ArgumentError, 'Neither form class nor initialize block ' \
-							'is not present'
+						raise ArgumentError, 'Neither form class nor initialize block is not present'
 					end
 
 					fields_and_nested_forms[name] = options.merge(form: form)
