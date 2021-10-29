@@ -8,7 +8,7 @@ module Formalism
 				def initialize(value, *)
 					@value = value
 
-					type_name = self.class.name.split('::')[3..-1].join('::')
+					type_name = self.class.name.split('::')[3..].join('::')
 
 					@type =
 						if Object.const_defined?(type_name, false)
