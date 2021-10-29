@@ -13,14 +13,18 @@ bundle_cache: &bundle_cache
 remark_task:
   container:
     image: node
+
   node_modules_cache:
     folder: node_modules
     fingerprint_script:
       - echo $CIRRUS_OS
       - node -v
       - cat package.json
+
   install_script: npm install
+
   lint_script: npm run remark
+
   only_if: ($CIRRUS_BRANCH == 'master') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'package.json', '.remarkrc.yaml', '**.md'
@@ -29,8 +33,11 @@ remark_task:
 rubocop_task:
   container:
     image: ruby
+
   <<: *bundle_cache
+
   lint_script: bundle exec rubocop
+
   only_if: ($CIRRUS_BRANCH == 'master') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'Gemfile', 'Rakefile', '*.gemspec', '.rubocop.yml',
@@ -41,16 +48,29 @@ rspec_task:
   depends_on:
     - remark
     - rubocop
+
   container:
     matrix:
       image: ruby:2.5
       image: ruby:2.6
       image: ruby:2.7
       image: ruby:3.0
+
   <<: *bundle_cache
-  environment:
-    CODECOV_TOKEN: ENCRYPTED[ee9c28ba3e11236da30417cd94307ad22671e1db65b53b4e9c3c6c2cf63049b92f18641832cf18d5fd250f0c4a8c768d]
+
   test_script: bundle exec rspec
+
+  codecov_uploader_cache:
+    folder: codecov
+    fingerprint_script:
+      - curl --no-progress-meter https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
+    populate_script:
+      - mkdir -p codecov
+      - curl https://uploader.codecov.io/latest/linux/codecov -o codecov/uploader
+      - chmod +x codecov/uploader
+
+  codecov_script: codecov/uploader
+
   only_if: ($CIRRUS_BRANCH == 'master') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'Gemfile', 'Rakefile', '*.gemspec', '.rspec',
