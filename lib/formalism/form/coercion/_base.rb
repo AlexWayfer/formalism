@@ -12,8 +12,9 @@ module Formalism
 
 					@type =
 						if Object.const_defined?(type_name, false)
-						then Object.const_get(type_name, false)
-						else type_name
+							Object.const_get(type_name, false)
+						else
+							type_name
 						end
 				end
 

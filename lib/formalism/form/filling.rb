@@ -52,7 +52,9 @@ module Formalism
 			end
 
 			def fill_nested_form(name, options)
-				return unless (form = initialize_nested_form(name, options))
+				args = args_for_nested_form(name, options)
+
+				return unless (form = initialize_nested_form(options, args))
 
 				nested_forms[name] = form
 			end
@@ -61,18 +63,23 @@ module Formalism
 				default.is_a?(Proc) ? instance_exec(&default) : default
 			end
 
-			def initialize_nested_form(name, options)
-				args =
-					if @params.key?(name) then [send("params_for_nested_#{name}")]
-					elsif instance_respond_to?(name) then [instance_public_send(name)]
-					elsif options.key?(:default) then [process_default(options[:default])]
-					else []
-					end
-
+			def initialize_nested_form(options, args)
 				result =
 					instance_exec options[:form], &options.fetch(:initialize, ->(form) { form.new(*args) })
 				result.runnable = false unless runnable
 				result
+			end
+
+			def args_for_nested_form(name, options)
+				if @params.key?(name)
+					[send("params_for_nested_#{name}")]
+				elsif instance_respond_to?(name)
+					[instance_public_send(name)]
+				elsif options.key?(:default)
+					[process_default(options[:default])]
+				else
+					[]
+				end
 			end
 		end
 
