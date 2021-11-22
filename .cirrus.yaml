@@ -25,7 +25,7 @@ remark_task:
 
   lint_script: npm run remark
 
-  only_if: ($CIRRUS_BRANCH == 'master') ||
+  only_if: ($CIRRUS_BRANCH == 'main') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'package.json', '.remarkrc.yaml', '**.md'
     )
@@ -51,7 +51,7 @@ rubocop_task:
 
   lint_script: bundle exec rubocop
 
-  only_if: ($CIRRUS_BRANCH == 'master') ||
+  only_if: ($CIRRUS_BRANCH == 'main') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'Gemfile', 'Rakefile', '*.gemspec', '.rubocop.yml',
       '**.rb', '**.ru'
@@ -84,7 +84,7 @@ rspec_task:
 
   codecov_script: codecov/uploader
 
-  only_if: ($CIRRUS_BRANCH == 'master') ||
+  only_if: ($CIRRUS_BRANCH == 'main') ||
     changesInclude(
       '.cirrus.yaml', '.gitignore', 'Gemfile', 'Rakefile', '*.gemspec', '.rspec',
       'lib/**', 'spec/**'
