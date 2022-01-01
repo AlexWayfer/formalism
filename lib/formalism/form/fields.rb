@@ -131,9 +131,7 @@ module Formalism
 					for_merge ? select_for_merge(:nested_forms) : nested_forms
 
 				fields(for_merge: for_merge).merge(
-					merging_nested_forms
-						.map { |name, _nested_form| [name, public_send(name)] }
-						.to_h
+					merging_nested_forms.to_h { |name, _nested_form| [name, public_send(name)] }
 				)
 			end
 
