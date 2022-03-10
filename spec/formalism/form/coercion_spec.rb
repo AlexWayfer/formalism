@@ -258,13 +258,13 @@ describe Formalism::Form::Coercion do
 			context 'when value is non-booblean String' do
 				let(:value) { '42' }
 
-				it { is_expected.to eq true }
+				it { is_expected.to be true }
 			end
 
 			context 'when value is boolean String' do
 				let(:value) { 'false' }
 
-				it { is_expected.to eq false }
+				it { is_expected.to be false }
 			end
 		end
 
