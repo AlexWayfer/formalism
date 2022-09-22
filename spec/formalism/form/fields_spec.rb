@@ -148,8 +148,8 @@ describe Formalism::Form::Fields do
 				{
 					one: :first,
 					two: :second,
-					inner: Inner.new(name: 'regular'),
-					inner_with_default: Inner.new(name: :another),
+					inner: Inner.new({ name: 'regular' }),
+					inner_with_default: Inner.new({ name: :another }),
 					three: :third,
 					four: :fourth
 				}
