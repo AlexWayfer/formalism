@@ -35,7 +35,7 @@ describe Formalism::Form do
 				end
 
 				def id=(_value)
-					raise ArgumentError, 'id is a restricted primary key'
+					# raise ArgumentError, 'id is a restricted primary key'
 				end
 
 				def save
@@ -135,8 +135,7 @@ describe Formalism::Form do
 				private
 
 				def execute
-					@instance =
-						Model.new(:foo, :bar).create(fields_and_nested_forms)
+					# @instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
 				end
 			end
 		end
@@ -510,7 +509,7 @@ describe Formalism::Form do
 					private
 
 					def execute
-						@instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
+						# @instance = Model.new(:foo, :bar).create(fields_and_nested_forms)
 					end
 				end
 			end
@@ -740,7 +739,7 @@ describe Formalism::Form do
 				end
 
 				def execute
-					@instance = Compositor.find_or_create(fields_and_nested_forms)
+					# @instance = Compositor.find_or_create(fields_and_nested_forms)
 				end
 			end
 		end
@@ -804,6 +803,7 @@ describe Formalism::Form do
 					tag_form.run
 					label_form.run
 					producer_form.run
+					compositor_form.run
 					super
 				end
 
