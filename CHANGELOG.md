@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.5.0 (2022-09-24)
+
+*   Drop Ruby 2.5 support.
+*   Add Ruby 3.1 support.
+*   Add coercion to `Object`.
+*   Add coercion to `Class`.
+*   Update development dependencies.
+*   Resolve new offenses from RuboCop.
+*   Resolve Ruby warnings.
+*   Increase tests coverage to 100%.
+*   Add `bundle-audit` CI task.
+*   Update metadata in gemspec.
+
 ## 0.4.0 (2021-02-11)
 
 *   Support Ruby 3.
