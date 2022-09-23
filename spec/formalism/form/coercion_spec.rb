@@ -49,7 +49,7 @@ describe Formalism::Form::Coercion do
 	end
 
 	describe '#result_for' do
-		subject { coercion.result_for(value) }
+		subject(:result) { coercion.result_for(value) }
 
 		# let(:value) { nil }
 		let(:type) { [type] }
@@ -316,6 +316,33 @@ describe Formalism::Form::Coercion do
 					let(:value) { '13.13.13' }
 
 					it { is_expected.to be_nil }
+				end
+			end
+		end
+
+		context 'with Class type' do
+			let(:type) { Class }
+
+			it_behaves_like 'it parses nil'
+			it_behaves_like 'it parses empty string'
+
+			context 'when object is Class' do
+				let(:value) { Class.new }
+
+				it { is_expected.to eq value }
+			end
+
+			context 'when object is String' do
+				context 'when class exists' do
+					let(:value) { 'Integer' }
+
+					it { is_expected.to eq Integer }
+				end
+
+				context 'when class does not exist' do
+					let(:value) { 'Foo' }
+
+					it { expect { result }.to raise_error(NameError) }
 				end
 			end
 		end
