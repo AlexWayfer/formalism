@@ -11,8 +11,8 @@ module Formalism
 					type_name = self.class.name.split('::')[3..].join('::')
 
 					@type =
-						if Object.const_defined?(type_name, false)
-							Object.const_get(type_name, false)
+						if ::Object.const_defined?(type_name, false)
+							::Object.const_get(type_name, false)
 						else
 							type_name
 						end
@@ -27,7 +27,7 @@ module Formalism
 				private
 
 				def should_be_coreced?
-					@type != 'Base' && !(@type.is_a?(Class) && @value.is_a?(@type))
+					@type != 'Base' && !(@type.is_a?(::Class) && @value.is_a?(@type))
 				end
 			end
 		end

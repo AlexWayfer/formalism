@@ -79,6 +79,33 @@ describe Formalism::Form::Coercion do
 			it { is_expected.to eql(expected_result) }
 		end
 
+		context 'with Object type' do
+			let(:type) { Object }
+
+			it_behaves_like 'it parses nil'
+			it_behaves_like 'it parses empty string', ''
+			it_behaves_like 'it parses empty array', []
+			it_behaves_like 'it parses empty hash', {}
+
+			context 'when object is Object' do
+				let(:value) { Object.new }
+
+				it { is_expected.to eq value }
+			end
+
+			context 'when object is Class' do
+				let(:value) { Class.new }
+
+				it { is_expected.to eq value }
+			end
+
+			# context 'when object is BasicObject' do
+			# 	let(:value) { BasicObject.new }
+			#
+			# 	it { is_expected.to eq value }
+			# end
+		end
+
 		context 'with String type' do
 			let(:type) { String }
 
