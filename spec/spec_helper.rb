@@ -11,4 +11,8 @@ SimpleCov.start
 
 require 'pry-byebug'
 
+RSpec.configure do |config|
+	config.example_status_persistence_file_path = "#{__dir__}/examples.txt"
+end
+
 require_relative '../lib/formalism'
