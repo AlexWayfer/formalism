@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.5.1 (2022-09-24)
+
+*  Allow `gorilla_patch` version 5.
+
 ## 0.5.0 (2022-09-24)
 
 *   Drop Ruby 2.5 support.
