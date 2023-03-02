@@ -29,6 +29,8 @@ describe Formalism::Form do
 				end
 
 				def initialize(columns)
+					super
+
 					columns.each do |column, value|
 						public_send "#{column}=", value
 					end
