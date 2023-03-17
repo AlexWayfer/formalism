@@ -289,6 +289,22 @@ form.to_params
 For actions without fields, nesting and validation you can use
 `Formalism::Action` (the parent of `Formalism::Form`).
 
+
+### Plugins
+
+There is a few plugins which I personally need for:
+
+*   [`formalism-model_forms`](https://github.com/AlexWayfer/formalism-model_forms)
+    Default CRUD forms for [Sequel](https://sequel.jeremyevans.net/) DB models.
+    Can be renamed!
+
+*   [`formalism-sequel_transactions`](https://github.com/AlexWayfer/formalism-sequel_transactions)
+    [Sequel](https://sequel.jeremyevans.net/) transactions inside forms.
+
+*   [`formalism-r18n_errors`](https://github.com/AlexWayfer/formalism-r18n_errors)
+    [R18n](https://github.com/r18n/r18n) errors inside forms, including validation helpers.
+    Can be separated!
+
 ## Development
 
 After checking out the repo, run `bundle install` to install dependencies.
