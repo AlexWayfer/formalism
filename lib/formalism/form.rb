@@ -32,7 +32,10 @@ module Formalism
 		end
 
 		def valid?
+			## https://github.com/rubocop/rubocop/pull/11967#issuecomment-1605561645
+			# rubocop:disable Style/ReturnNilInPredicateMethodDefinition
 			return unless runnable
+			# rubocop:enable Style/ReturnNilInPredicateMethodDefinition
 
 			errors.clear
 
