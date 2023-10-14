@@ -11,7 +11,7 @@ group :development do
 	gem 'bundler-audit', '~> 0.9.0'
 
 	gem 'gem_toys', '~> 0.12.1'
-	gem 'toys', '~> 0.14.2'
+	gem 'toys', '~> 0.15.0'
 end
 
 group :test do
