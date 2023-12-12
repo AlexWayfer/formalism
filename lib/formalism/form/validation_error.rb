@@ -8,7 +8,7 @@ module Formalism
 
 			def initialize(errors)
 				@errors = errors
-				super "Outcome has errors: #{errors.to_a}"
+				super("Outcome has errors: #{errors.to_a}")
 			end
 		end
 	end

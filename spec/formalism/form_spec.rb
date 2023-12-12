@@ -323,7 +323,7 @@ describe Formalism::Form do
 					def initialize(params, set_count: false)
 						self.count = 2 if set_count
 
-						super params
+						super(params)
 					end
 				end
 			end
@@ -1116,7 +1116,7 @@ describe Formalism::Form do
 						nested :bar, bar_form_class, merge_errors: -> { @should_merge_bar }
 
 						def initialize(params, should_merge_bar)
-							super params
+							super(params)
 
 							@should_merge_bar = should_merge_bar
 						end
@@ -1216,7 +1216,7 @@ describe Formalism::Form do
 				def initialize(params, runnable)
 					self.runnable = runnable
 
-					super params
+					super(params)
 				end
 
 				private

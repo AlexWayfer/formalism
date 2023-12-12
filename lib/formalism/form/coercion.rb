@@ -53,7 +53,7 @@ module Formalism
 		## Error for undefined type in coercion
 		class NoCoercionError < ArgumentError
 			def initialize(type)
-				super "Formalism has no coercion to #{type}"
+				super("Formalism has no coercion to #{type}")
 			end
 		end
 	end
