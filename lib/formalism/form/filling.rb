@@ -72,7 +72,7 @@ module Formalism
 
 			def args_for_nested_form(name, options)
 				if @params.key?(name)
-					[send("params_for_nested_#{name}")]
+					[send(:"params_for_nested_#{name}")]
 				elsif instance_respond_to?(name)
 					[instance_public_send(name)]
 				elsif options.key?(:default)
