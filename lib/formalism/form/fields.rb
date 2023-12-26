@@ -52,7 +52,7 @@ module Formalism
 					fields_and_nested_forms.delete name
 
 					undef_method name
-					undef_method "#{name}="
+					undef_method :"#{name}="
 				end
 
 				def define_field_methods(name)
@@ -61,7 +61,7 @@ module Formalism
 
 						private
 
-						define_method("#{name}=") do |value|
+						define_method :"#{name}=" do |value|
 							options = self.class.fields_and_nested_forms[name]
 							coerced_value =
 								Coercion.new(*options.values_at(:type, :of)).result_for(value)
@@ -72,7 +72,7 @@ module Formalism
 
 				def define_nested_form_methods(name)
 					module_for_accessors.instance_exec do
-						define_method("#{name}_form") { nested_forms[name] }
+						define_method(:"#{name}_form") { nested_forms[name] }
 
 						define_method(name) { nested_forms[name].instance }
 					end

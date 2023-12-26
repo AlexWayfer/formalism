@@ -32,7 +32,7 @@ describe Formalism::Form do
 					super
 
 					columns.each do |column, value|
-						public_send "#{column}=", value
+						public_send :"#{column}=", value
 					end
 				end
 
