@@ -9,7 +9,7 @@ module Formalism
 					private
 
 					def wrap_value_regexp(content)
-						/\A\s*#{content}\s*\z/.freeze
+						/\A\s*#{content}\s*\z/
 					end
 				end
 
