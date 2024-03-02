@@ -264,7 +264,7 @@ describe Formalism::Form do
 				shared_examples 'raise error' do
 					it do
 						expect { subject }.to raise_error(
-							Formalism::Form::NoCoercionError,
+							described_class::NoCoercionError,
 							'Formalism has no coercion to Module'
 						)
 					end
@@ -662,9 +662,8 @@ describe Formalism::Form do
 
 				include_examples 'there are no Albums'
 
-				it do
-					expect { result }
-						.to raise_error Formalism::Form::ValidationError, error_message
+				specify do
+					expect { result }.to raise_error described_class::ValidationError, error_message
 				end
 			end
 		end
