@@ -5,6 +5,8 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
+	gem 'bigdecimal', '~> 3.1'
+
 	gem 'pry-byebug', '~> 3.9'
 
 	gem 'bundler', '~> 2.0'
