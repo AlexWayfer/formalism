@@ -4,7 +4,7 @@
 
 ## 0.5.1 (2022-09-24)
 
-*  Allow `gorilla_patch` version 5.
+*   Allow `gorilla_patch` version 5.
 
 ## 0.5.0 (2022-09-24)
 
