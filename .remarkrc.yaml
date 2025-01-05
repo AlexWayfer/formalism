@@ -1,3 +1,5 @@
 plugins:
   - remark-preset-lint-recommended
   - remark-gfm
+  - - remark-lint-list-item-indent
+    - tab
