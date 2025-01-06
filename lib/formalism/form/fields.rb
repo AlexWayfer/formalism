@@ -63,10 +63,23 @@ module Formalism
 
 						define_method :"#{name}=" do |value|
 							options = self.class.fields_and_nested_forms[name]
-							coerced_value =
-								Coercion.new(*options.values_at(:type, :of)).result_for(value)
+							coerced_value = Coercion.new(*options.values_at(:type, :of)).result_for(value)
 							fields[name] = coerced_value
 						end
+					end
+
+					reset_undefined_field_methods(name)
+				end
+
+				def reset_undefined_field_methods(name)
+					class_exec do
+						define_method(name) { super() }
+						remove_method name
+
+						private
+
+						define_method(:"#{name}=") { |value| super(value) }
+						remove_method :"#{name}="
 					end
 				end
 
@@ -83,13 +96,14 @@ module Formalism
 				def define_params_for_nested_method(name)
 					params_method_name = "params_for_nested_#{name}"
 					params_method_defined =
-						method_defined?(params_method_name) ||
-						private_method_defined?(params_method_name)
+						method_defined?(params_method_name) || private_method_defined?(params_method_name)
+
+					return if params_method_defined
 
 					module_for_accessors.instance_exec do
 						private
 
-						define_method(params_method_name) { @params[name] } unless params_method_defined
+						define_method(params_method_name) { @params[name] }
 					end
 				end
 

@@ -449,6 +449,9 @@ describe Formalism::Form do
 
 						field :quux
 						remove_field :quux
+
+						remove_field :foo
+						field :foo
 					end
 					result
 				end
@@ -466,6 +469,20 @@ describe Formalism::Form do
 						end
 
 						it { is_expected.to be false }
+					end
+				end
+
+				describe 'methods of removed and re-defined fields' do
+					subject { form_class.method_defined?(:foo) }
+
+					it { is_expected.to be true }
+
+					describe 'child form has no methods of removed fields' do
+						let(:form_class) do
+							Class.new super()
+						end
+
+						it { is_expected.to be true }
 					end
 				end
 
