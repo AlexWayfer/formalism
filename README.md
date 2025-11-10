@@ -216,6 +216,7 @@ For example:
 ```ruby
 field :bar, merge: true
 nested :only_valid, nested_form_class, merge: ->(form) { form.valid? }
+# or `merge: lambda(&:valid?)`
 ```
 
 ### Runnable
