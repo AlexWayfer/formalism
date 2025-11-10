@@ -523,7 +523,7 @@ describe Formalism::Form do
 					field :bar, merge: true
 					field :baz, merge: false
 					field :qux, merge: proc { baz == 5 }
-					nested :nested, nested_form_class, merge: ->(form) { form.valid? }
+					nested :nested, nested_form_class, merge: lambda(&:valid?)
 
 					private
 
