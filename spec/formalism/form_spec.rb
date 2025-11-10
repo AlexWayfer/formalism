@@ -92,7 +92,7 @@ describe Formalism::Form do
 		end
 	end
 
-	shared_examples 'there are no Albums' do
+	shared_examples 'created no Albums' do
 		before do
 			form_run
 		end
@@ -104,7 +104,7 @@ describe Formalism::Form do
 		end
 	end
 
-	shared_examples 'there is one Album' do
+	shared_examples 'created one Album' do
 		before do
 			form_run
 		end
@@ -666,7 +666,7 @@ describe Formalism::Form do
 
 				it { is_expected.to eq Album.new(params) }
 
-				include_examples 'there is one Album'
+				it_behaves_like 'created one Album'
 			end
 
 			context 'with incorrect params' do
@@ -677,7 +677,7 @@ describe Formalism::Form do
 					MESSAGE
 				end
 
-				include_examples 'there are no Albums'
+				it_behaves_like 'created no Albums'
 
 				specify do
 					expect { result }.to raise_error described_class::ValidationError, error_message
@@ -875,12 +875,12 @@ describe Formalism::Form do
 				)
 			end
 
-			shared_examples 'global data is empty' do
+			shared_examples 'validation fail' do
 				before do
 					form_run
 				end
 
-				include_examples 'there are no Albums'
+				it_behaves_like 'created no Albums'
 
 				describe 'all Artists' do
 					subject { Artist.all }
@@ -901,7 +901,7 @@ describe Formalism::Form do
 				end
 			end
 
-			shared_examples 'global data is not empty' do
+			shared_examples 'validation success' do
 				before do
 					form_run
 				end
@@ -919,7 +919,7 @@ describe Formalism::Form do
 				let(:label) { Label.new(name: 'RAM') }
 				let(:producer) { Artist.new(name: 'Producer') }
 
-				include_examples 'there is one Album'
+				it_behaves_like 'created one Album'
 
 				describe 'all Artists' do
 					subject { Artist.all }
@@ -948,7 +948,7 @@ describe Formalism::Form do
 
 					it { is_expected.to be true }
 
-					include_examples 'global data is not empty'
+					it_behaves_like 'validation success'
 				end
 
 				context 'with incorrect params' do
@@ -956,7 +956,7 @@ describe Formalism::Form do
 
 					it { is_expected.to be false }
 
-					include_examples 'global data is empty'
+					it_behaves_like 'validation fail'
 				end
 			end
 
@@ -968,7 +968,7 @@ describe Formalism::Form do
 
 					it { is_expected.to be_empty }
 
-					include_examples 'global data is not empty'
+					it_behaves_like 'validation success'
 				end
 
 				context 'with incorrect params' do
@@ -982,7 +982,7 @@ describe Formalism::Form do
 
 					it { is_expected.to eq result_errors }
 
-					include_examples 'global data is empty'
+					it_behaves_like 'validation fail'
 				end
 			end
 

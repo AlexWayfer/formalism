@@ -36,7 +36,7 @@ describe Formalism::Action do
 		end
 	end
 
-	shared_examples 'run' do
+	shared_examples 'runnable action' do
 		context 'with correct value' do
 			let(:params) { correct_run_params }
 
@@ -57,7 +57,7 @@ describe Formalism::Action do
 	describe '#run' do
 		subject { test_action.run }
 
-		include_examples 'run'
+		it_behaves_like 'runnable action'
 
 		context 'when `runnable` if false' do
 			before do
@@ -81,6 +81,6 @@ describe Formalism::Action do
 	describe '.run' do
 		subject { test_action_class.run(params) }
 
-		include_examples 'run'
+		it_behaves_like 'runnable action'
 	end
 end
