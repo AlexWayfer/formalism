@@ -9,7 +9,6 @@ group :development do
 
 	gem 'pry-byebug', '~> 3.9'
 
-	gem 'bundler', '~> 2.0'
 	gem 'bundler-audit', '~> 0.9.0'
 
 	gem 'gem_toys', '~> 0.16.0'
