@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-	gem 'bigdecimal', '~> 3.1'
+	gem 'bigdecimal', '~> 4.0'
 
 	gem 'pry-byebug', '~> 3.9'
 
