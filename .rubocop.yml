@@ -41,7 +41,7 @@ Naming/MethodParameterName:
     - of
 
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
   NewCops: enable
 
 RSpec/NestedGroups:
