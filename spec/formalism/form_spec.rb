@@ -295,9 +295,11 @@ describe Formalism::Form do
 		end
 
 		describe ':default option' do
-			default_created_at = Time.new(2018, 5, 7, 14, 40)
+			let(:default_created_at) { Time.new(2018, 5, 7, 14, 40) }
 
 			let(:form_class) do
+				default_created_at = self.default_created_at
+
 				Class.new(described_class) do
 					field :foo
 					field :bar, Integer, default: nil
